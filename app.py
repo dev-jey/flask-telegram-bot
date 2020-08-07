@@ -3,11 +3,16 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 import time
 from flask import Flask, render_template, request
+import pickle
+
 app = Flask(__name__)
 
 
 options = webdriver.ChromeOptions()
-options.add_argument("user-data-dir=/Users/jey/Library/Application Support/Google/Chrome/Sel")
+
+options.add_experimental_option("detach", True)
+options.add_argument("user-data-dir=myselenium")
+
 
 
 @app.route('/')
@@ -16,6 +21,7 @@ def home():
 
 @app.route("/get")
 def start_messaging():
+    # driver.get("https://web.telegram.org/")
     link = request.args.get('link')
     message = request.args.get('msg')
     duration = request.args.get('duration')
@@ -23,7 +29,9 @@ def start_messaging():
 
 
 def start_browser(link, message, duration):
+    global driver
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+    # options.add_argument("--headless")  
     driver.maximize_window()
     driver.get(link)
     driver.implicitly_wait(20)
