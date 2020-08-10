@@ -10,6 +10,11 @@ gunicorn = "*"
 flask = "*"
 selenium = "*"
 webdriver-manager = "*"
+postgres = "*"
+psycopg2 = "*"
+flask-sqlalchemy = "*"
+flask-script = "*"
+python-dotenv = "*"
 
 [requires]
 python_version = "3.8"
