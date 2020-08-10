@@ -5,7 +5,7 @@ from . import db
 class User(db.Model):
     """Data model for user accounts."""
 
-    __tablename__ = 'flasksqlalchemy-tutorial-users'
+    __tablename__ = 'users'
     id = db.Column(
         db.Integer,
         primary_key=True
