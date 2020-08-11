@@ -3,6 +3,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 import time
 import datetime
+import re
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime as dt
 from flask import Flask, render_template, request, redirect, url_for, flash, make_response, session
@@ -34,7 +35,7 @@ def home():
 
 
 @app.route('/register', methods=['GET'])
-def user_records():
+def register():
     """Create a user via query string parameters."""
     username = request.args.get('username')
     email = request.args.get('email')
@@ -42,7 +43,9 @@ def user_records():
     confirm_password = request.args.get('repassword')
     if not username or not email or not password:
         return make_response(f"Ensure all fields are filled!")
-
+    EMAIL_REGEX = re.compile(r"[^@\s]+@[^@\s]+\.[a-zA-Z0-9]+$")
+    if not EMAIL_REGEX.match(email):
+        return make_response(f"Enter a valid email!")
     existing_user = User.query.filter(
             User.username == username or User.email == email
         ).first()
