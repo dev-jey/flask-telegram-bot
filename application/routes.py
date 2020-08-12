@@ -16,6 +16,7 @@ from .models import db, User, Process
 
 
 options = webdriver.ChromeOptions()
+options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
 app.permanent_session_lifetime = datetime.timedelta(days=365)
 
 
@@ -160,7 +161,7 @@ def start_messaging():
 
 def start_browser(pid, link, message, duration):
     global driver
-    driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+    driver = webdriver.Chrome(executable_path=str(os.environ.get('CHROMEDRIVER_PATH')), options=options)
     wait = WebDriverWait(driver, 10000)
     driver.maximize_window()
     try:
