@@ -17,11 +17,11 @@ from .models import db, User, Process
 
 # options = webdriver.ChromeOptions()
 
-chrome_options = Options()
+options = Options()
 options.add_argument("--start-maximized") #open Browser in maximized mode
-chrome_options.add_argument('--headless')
-chrome_options.add_argument('--no-sandbox')
-chrome_options.add_argument('--disable-dev-shm-usage')
+options.add_argument('--headless')
+options.add_argument('--no-sandbox')
+options.add_argument('--disable-dev-shm-usage')
 options.binary_location = environ.get('GOOGLE_CHROME_BIN')
 app.permanent_session_lifetime = datetime.timedelta(days=365)
 
