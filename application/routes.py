@@ -19,7 +19,7 @@ from .models import db, User, Process
 
 options = Options()
 options.add_argument("--start-maximized") #open Browser in maximized mode
-options.add_argument('--headless')
+# options.add_argument('--headless')
 options.add_argument('--no-sandbox')
 options.add_argument('--disable-dev-shm-usage')
 options.binary_location = environ.get('GOOGLE_CHROME_BIN')
