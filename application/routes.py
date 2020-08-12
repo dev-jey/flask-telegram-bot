@@ -15,9 +15,7 @@ from flask import current_app as app
 from .models import db, User, Process
 
 
-# options = webdriver.ChromeOptions()
-
-options = Options()
+options = webdriver.ChromeOptions()
 options.add_argument("start-maximized")
 options.add_argument('--disable-gpu')
 options.add_argument("disable-infobars")
@@ -26,7 +24,6 @@ options.add_argument("--no-sandbox")
 options.add_argument("--disable-setuid-sandbox") 
 options.add_argument("--remote-debugging-port=9222")
 options.add_argument("--disable-dev-shm-usage")
-options.binary_location = environ.get('GOOGLE_CHROME_BIN')
 app.permanent_session_lifetime = datetime.timedelta(days=365)
 
 
@@ -183,7 +180,7 @@ def start_messaging():
 
 def start_browser(pid, link, message, duration):
     global driver
-    driver = webdriver.Chrome(executable_path=str(environ.get('CHROMEDRIVER_PATH')), options=options)
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
     wait = WebDriverWait(driver, 10000)
     driver.maximize_window()
     try:
