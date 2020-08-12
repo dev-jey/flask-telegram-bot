@@ -59,17 +59,16 @@
             <div class="container header">
 
                 <!-- Navbar Brand-->
-                <a class="navbar-brand" href="index.html">
+                <a class="navbar-brand" href="/">
                     DevJey<i>.</i>
                 </a>
 
                 <!-- Nav holder -->
                 <div class="ml-auto"></div>
-
                 <!--Nav items -->
                 <ul class="navbar-nav items">
                     <li class="nav-item">
-                        <a href="/processes" class="nav-link">My Processes</a>
+                        <a href="/processes" class="nav-link active">My Processes</a>
                     </li>
                 </ul>
                 <!-- Navbar Action -->
@@ -90,50 +89,46 @@
     <section id="contact" class="section-1 odd form">
         <div class="container smaller">
 
-            {% if user_details.active %}
-            <br><br><br>
-
-            <div class="row text-center intro">
-                <div class="col-12">
-                    <h2>Start Automating here</h2>
-                    <p class="text-max-800">Enter the link to the person or group to send the message to.</p>
-                </div>
-            </div>
-            <form action="https://leverage.codings.dev/php/form.php" id="leverage-simple-form"
-                class="leverage-simple-form">
-                <input type="hidden" name="section" value="leverage_form">
-
-                <input type="hidden" name="reCAPTCHA">
-
-                <div class="row form-group-margin">
-                    <div class="col-12 col-md-6 m-0 p-2 input-group">
-                        <input id="link" type="text" name="link" placeholder="Link e.g https://web.telegram.org/#/im?p=@kenyanacademicwriters" required
-                            class="form-control field-phone">
-                    </div>
-                    <div class="col-12 col-md-6 m-0 p-2 input-group">
-                        <input id="duration" type="number" name="duration" placeholder="Duration in hours"
-                            class="form-control field-phone" onkeydown="return event.keyCode !== 69" min="1" max="24" required>
-                    </div>
-                    <div class="col-12 m-0 p-2 input-group">
-                        <textarea name="msg" id="msg" class="form-control field-message" placeholder="Message"
-                            required></textarea>
-                    </div>
-                    <div class="col-12 col-12 m-0 pl-md-2">
-                        <span class="form-alert"></span>
-                    </div>
-                    <div class="col-12 input-group m-0 p-2">
-                        <input id="buttonInput" type="submit" value="Send">
-                    </div>
-                </div>
-            </form>
+            <br>
+            <h3>All Past Processes</h3>
+            <br>
+            {% if processes %}
+            <table class="table table-responsive-md table-bordered" style="color:white;border-collapse:collapse;">
+                <thead>
+                    <tr>
+                        <th>PID</th>
+                        <th>Link</th>
+                        <th>Message</th>
+                        <th>Repeat after every hr(s)</th>
+                        <th>Iterations so far</th>
+                        <th>Last Run On</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                {% for p in processes %}
+                <tbody>
+                    <tr>
+                        <td name="pid" id="pid">{{p.id}}</td>
+                        <td name="link" id="link">{{p.link}}</td>
+                        <td name="message" id="message">{{p.message}}</td>
+                        <td name="duration" id="duration">{{p.duration}}</td>
+                        <td>{{p.iterations}}</td>
+                        <td>{{p.created}}</td>
+                        <td>
+                            <button class="btn ml-lg-auto primary-button" class="nav-link" id="start" type="submit"><i
+                                    class="icon-load"></i>Restart</button></td>
+                    </tr>
+                </tbody>
+                {% endfor %}
+            </table>
             {% else %}
-            <br><br><br><br><br><br><br><br><br><br>
-            <div class="row text-left intro">
-                <h2>Your account is currently deactivated</h2>
-                To access your dashboard, contact the admin.
-                <br><br><br><br><br>
-            </div>
+            <h6>No Past Processes currently!</h6>
             {% endif %}
+
+            <br><br><br>
+            <br><br><br>
+            <br><br><br>
+            <br><br><br>
         </div>
     </section>
 
@@ -181,20 +176,24 @@
         function logout() {
             $.get("/logout")
         }
-        function getBotResponse() {
-            var msg = $("#msg").val();
-            var duration = $("#duration").val();
-            var link = $("#link").val();
-            var pid = null;
-            $.get("/automate", { msg: msg, duration: duration, link: link, pid:pid });
+        function start_transactions() {
+            var pid = $("#pid").text();
+            var link = $("#link").text();;
+            var message = $("#message").text();;
+            var duration = $("#duration").text();;
+            $.get("/automate", { pid: pid, message: message, link: link, duration: duration }).then(res => {
+                window.location.reload();
+            }).then(res => {
+                console.log(res)
+            })
         }
         $("#logout").click(function (e) {
             e.preventDefault();
             logout();
             window.location.replace("/")
         })
-        $("#buttonInput").click(function () {
-            getBotResponse();
+        $("#start").click(function () {
+            start_transactions();
         })
     </script>
 </body>

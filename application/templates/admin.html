@@ -12,7 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
-    <title>DevJey - Dashboard</title>
+    <title>DevJey - Admin</title>
 
     <meta name="description" content="Creative Agency, Portfolio, Corporate, Startup & Technology">
     <meta name="subject" content="Creative Agency, Portfolio, Corporate, Startup & Technology">
@@ -65,13 +65,6 @@
 
                 <!-- Nav holder -->
                 <div class="ml-auto"></div>
-
-                <!--Nav items -->
-                <ul class="navbar-nav items">
-                    <li class="nav-item">
-                        <a href="/processes" class="nav-link">My Processes</a>
-                    </li>
-                </ul>
                 <!-- Navbar Action -->
                 <ul class="navbar-nav action">
                     <li class="nav-item ml-3">
@@ -86,57 +79,45 @@
         </nav>
 
     </header>
-
     <section id="contact" class="section-1 odd form">
         <div class="container smaller">
 
-            {% if user_details.active %}
-            <br><br><br>
-
-            <div class="row text-center intro">
-                <div class="col-12">
-                    <h2>Start Automating here</h2>
-                    <p class="text-max-800">Enter the link to the person or group to send the message to.</p>
-                </div>
-            </div>
-            <form action="https://leverage.codings.dev/php/form.php" id="leverage-simple-form"
-                class="leverage-simple-form">
-                <input type="hidden" name="section" value="leverage_form">
-
-                <input type="hidden" name="reCAPTCHA">
-
-                <div class="row form-group-margin">
-                    <div class="col-12 col-md-6 m-0 p-2 input-group">
-                        <input id="link" type="text" name="link" placeholder="Link e.g https://web.telegram.org/#/im?p=@kenyanacademicwriters" required
-                            class="form-control field-phone">
-                    </div>
-                    <div class="col-12 col-md-6 m-0 p-2 input-group">
-                        <input id="duration" type="number" name="duration" placeholder="Duration in hours"
-                            class="form-control field-phone" onkeydown="return event.keyCode !== 69" min="1" max="24" required>
-                    </div>
-                    <div class="col-12 m-0 p-2 input-group">
-                        <textarea name="msg" id="msg" class="form-control field-message" placeholder="Message"
-                            required></textarea>
-                    </div>
-                    <div class="col-12 col-12 m-0 pl-md-2">
-                        <span class="form-alert"></span>
-                    </div>
-                    <div class="col-12 input-group m-0 p-2">
-                        <input id="buttonInput" type="submit" value="Send">
-                    </div>
-                </div>
-            </form>
+            <br>
+            <h3>All Users</h3>
+            <br><br>
+            {% if users %}
+            <table class="table table-responsive-md table-bordered" style="color:white;border-collapse:collapse;">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Admin</th>
+                        <th>Active</th>
+                        <th>Joined On</th>
+                    </tr>
+                </thead>
+                {% for u in users %}
+                <tbody>
+                    <tr>
+                        <td>{{u.username}}</td>
+                        <td>{{u.email}}</td>
+                        <td>{{u.admin}}</td>
+                        <td>{{u.active}}</td>
+                        <td>{{u.created}}</td>
+                    </tr>
+                </tbody>
+                {% endfor %}
+            </table>
             {% else %}
-            <br><br><br><br><br><br><br><br><br><br>
-            <div class="row text-left intro">
-                <h2>Your account is currently deactivated</h2>
-                To access your dashboard, contact the admin.
-                <br><br><br><br><br>
-            </div>
+            <h1>No Users!</h1>
             {% endif %}
+
+            <br><br><br>
+            <br><br><br>
+            <br><br><br>
+            <br><br><br>
         </div>
     </section>
-
 
 
     <!-- Footer -->
@@ -181,20 +162,10 @@
         function logout() {
             $.get("/logout")
         }
-        function getBotResponse() {
-            var msg = $("#msg").val();
-            var duration = $("#duration").val();
-            var link = $("#link").val();
-            var pid = null;
-            $.get("/automate", { msg: msg, duration: duration, link: link, pid:pid });
-        }
         $("#logout").click(function (e) {
             e.preventDefault();
             logout();
             window.location.replace("/")
-        })
-        $("#buttonInput").click(function () {
-            getBotResponse();
         })
     </script>
 </body>

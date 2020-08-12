@@ -65,79 +65,39 @@
 
                 <!-- Nav holder -->
                 <div class="ml-auto"></div>
-
-                <!--Nav items -->
-                <ul class="navbar-nav items">
-                    <li class="nav-item">
-                        <a href="/processes" class="nav-link">My Processes</a>
-                    </li>
-                </ul>
                 <!-- Navbar Action -->
                 <ul class="navbar-nav action">
                     <li class="nav-item ml-3">
-                        <h6>Hi {{user}}!</h6>
-                    </li>
-                    <li class="nav-item ml-3">
-                        <a href="#" target="_blank" class="btn ml-lg-auto primary-button" class="nav-link" id="logout"
-                            data-toggle="modal" data-target="#logout"><i class="icon-rocket"></i>Logout</a>
+                        <a href="/" class="btn ml-lg-auto primary-button" class="nav-link">Back Home</a>
                     </li>
                 </ul>
             </div>
         </nav>
 
     </header>
+    <!-- Hero -->
+    <section id="slider" class="hero p-0 odd featured">
+        <div class="swiper-container no-slider slider-h-75">
+            <div class="swiper-wrapper">
 
-    <section id="contact" class="section-1 odd form">
-        <div class="container smaller">
+                <!-- Item 1 -->
+                <div class="swiper-slide slide-center">
 
-            {% if user_details.active %}
-            <br><br><br>
+                    <img src="/static/images/bg-2.jpg" class="full-image" data-mask="3">
 
-            <div class="row text-center intro">
-                <div class="col-12">
-                    <h2>Start Automating here</h2>
-                    <p class="text-max-800">Enter the link to the person or group to send the message to.</p>
-                </div>
-            </div>
-            <form action="https://leverage.codings.dev/php/form.php" id="leverage-simple-form"
-                class="leverage-simple-form">
-                <input type="hidden" name="section" value="leverage_form">
+                    <div class="slide-content row text-center">
+                        <div class="col-12 mx-auto inner">
+                            <h1 data-aos="zoom-out-up" data-aos-delay="400" class="title effect-static-text">INTERNAL SERVER ERROR</h1>
 
-                <input type="hidden" name="reCAPTCHA">
-
-                <div class="row form-group-margin">
-                    <div class="col-12 col-md-6 m-0 p-2 input-group">
-                        <input id="link" type="text" name="link" placeholder="Link e.g https://web.telegram.org/#/im?p=@kenyanacademicwriters" required
-                            class="form-control field-phone">
-                    </div>
-                    <div class="col-12 col-md-6 m-0 p-2 input-group">
-                        <input id="duration" type="number" name="duration" placeholder="Duration in hours"
-                            class="form-control field-phone" onkeydown="return event.keyCode !== 69" min="1" max="24" required>
-                    </div>
-                    <div class="col-12 m-0 p-2 input-group">
-                        <textarea name="msg" id="msg" class="form-control field-message" placeholder="Message"
-                            required></textarea>
-                    </div>
-                    <div class="col-12 col-12 m-0 pl-md-2">
-                        <span class="form-alert"></span>
-                    </div>
-                    <div class="col-12 input-group m-0 p-2">
-                        <input id="buttonInput" type="submit" value="Send">
+                        </div>
                     </div>
                 </div>
-            </form>
-            {% else %}
-            <br><br><br><br><br><br><br><br><br><br>
-            <div class="row text-left intro">
-                <h2>Your account is currently deactivated</h2>
-                To access your dashboard, contact the admin.
-                <br><br><br><br><br>
             </div>
-            {% endif %}
         </div>
+
+        <br><br><br>
+        <br><br><br>
     </section>
-
-
 
     <!-- Footer -->
     <footer>
@@ -177,26 +137,6 @@
     <script src="/static/js/vendor/animation.min.js"></script>
     <script src="/static/js/vendor/gallery.min.js"></script>
     <script src="/static/js/main.js"></script>
-    <script>
-        function logout() {
-            $.get("/logout")
-        }
-        function getBotResponse() {
-            var msg = $("#msg").val();
-            var duration = $("#duration").val();
-            var link = $("#link").val();
-            var pid = null;
-            $.get("/automate", { msg: msg, duration: duration, link: link, pid:pid });
-        }
-        $("#logout").click(function (e) {
-            e.preventDefault();
-            logout();
-            window.location.replace("/")
-        })
-        $("#buttonInput").click(function () {
-            getBotResponse();
-        })
-    </script>
 </body>
 
 
