@@ -23,6 +23,8 @@ options.add_argument('--disable-gpu')
 options.add_argument("disable-infobars")
 options.add_argument("--disable-extensions")
 options.add_argument("--no-sandbox")
+options.add_argument("--disable-setuid-sandbox") 
+options.add_argument("--remote-debugging-port=9222")
 options.add_argument("--disable-dev-shm-usage")
 options.binary_location = environ.get('GOOGLE_CHROME_BIN')
 app.permanent_session_lifetime = datetime.timedelta(days=365)
@@ -160,6 +162,18 @@ The automation
 
 @app.route("/automate")
 def start_messaging():
+    user = session.get('username')
+    try:
+        existing_user = User.query.filter(
+            User.username == user
+        ).first()
+        if not user:
+            return redirect(url_for("welcome"))
+        if existing_user.admin:
+            return redirect(url_for("admin"))
+    except BaseException as e:
+        session.pop('username', None)
+        return redirect(url_for("welcome"))
     pid = request.args.get('pid')
     link = request.args.get('link')
     message = request.args.get('msg')
