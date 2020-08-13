@@ -1,4 +1,4 @@
-alabaster==0.7.12
+alabaster==*
 anaconda-client==*
 anaconda-navigator==1.9.7
 anaconda-project==0.8.3
