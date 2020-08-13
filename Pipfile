@@ -15,6 +15,7 @@ psycopg2 = "*"
 flask-sqlalchemy = "*"
 flask-script = "*"
 python-dotenv = "*"
+google-cloud-logging = "*"
 
 [requires]
 python_version = "3.8"
