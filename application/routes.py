@@ -12,16 +12,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from flask import current_app as app
-import logging
 from .models import db, User, Process
-import google.cloud.logging
 
-
-# Instantiates a client
-client = google.cloud.logging.Client()
-
-client.get_default_handler()
-client.setup_logging()
 
 
 options = webdriver.ChromeOptions()
