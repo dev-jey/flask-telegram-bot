@@ -158,7 +158,7 @@ The automation
 '''
 
 
-@app.route("/automate", methods=['POST', 'GET'])
+# @app.route("/automate", methods=['POST', 'GET'])
 def start_messaging():
     user = session.get('username')
     try:
