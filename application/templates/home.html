@@ -101,7 +101,7 @@
             </div>
             <form id="leverage-simple-form"
                 class="leverage-simple-form">
-                <input type="hidden" name="section" value="leverage_form">
+                <!-- <input type="hidden" name="section" value="leverage_form"> -->
 
                 <!-- <input type="hidden" name="reCAPTCHA"> -->
 
@@ -194,6 +194,7 @@
             window.location.replace("/")
         })
         $("#buttonInput").click(function () {
+            e.preventDefault();
             getBotResponse();
         })
     </script>
