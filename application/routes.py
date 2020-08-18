@@ -41,7 +41,7 @@ def welcome():
     return render_template("index.html")
 
 
-@app.route('/home')
+@app.route('/home', methods=['POST', 'GET'])
 def home():
     user = session.get('username')
     if not user:
@@ -91,7 +91,7 @@ User authentication views
 '''
 
 
-@app.route('/register', methods=['GET'])
+@app.route('/register', methods=['POST', 'GET'])
 def register():
     """Create a user via query string parameters."""
     username = request.args.get('username')
@@ -131,7 +131,7 @@ def register():
         return make_response(f"A problem occurred during signup!")
 
 
-@app.route('/login', methods=['GET'])
+@app.route('/login', methods=['POST', 'GET'])
 def login():
     """Login via query string parameters."""
     user = request.args.get('user')
@@ -146,7 +146,7 @@ def login():
     return make_response(f'Wrong credentials! Try again')
 
 
-@app.route('/logout', methods=['GET'])
+@app.route('/logout', methods=['POST', 'GET'])
 def logout():
     """Logout via query string parameters."""
     session.pop('username', None)
@@ -158,7 +158,7 @@ The automation
 '''
 
 
-@app.route("/automate")
+@app.route("/automate", methods=['POST', 'GET'])
 def start_messaging():
     user = session.get('username')
     try:
@@ -216,7 +216,7 @@ def start_browser(pid, link, message, duration):
         driver.close()
         driver.quit()
 
-@app.route('/processes')
+@app.route('/processes', methods=['POST', 'GET'])
 def get_past_processes():
     user = session.get('username')
     if not user:
