@@ -91,44 +91,44 @@ User authentication views
 '''
 
 
-@app.route('/register', methods=['POST', 'GET'])
-def register():
-    """Create a user via query string parameters."""
-    username = request.args.get('username')
-    email = request.args.get('email')
-    password = request.args.get('password')
-    confirm_password = request.args.get('repassword')
-    if not username or not email or not password:
-        return make_response(f"Ensure all fields are filled!")
-    EMAIL_REGEX = re.compile(r"[^@\s]+@[^@\s]+\.[a-zA-Z0-9]+$")
-    if not EMAIL_REGEX.match(email):
-        return make_response(f"Enter a valid email!")
-    existing_user = User.query.filter(
-        User.username == username or User.email == email
-    ).first()
+# @app.route('/register', methods=['POST', 'GET'])
+# def register():
+#     """Create a user via query string parameters."""
+#     username = request.args.get('username')
+#     email = request.args.get('email')
+#     password = request.args.get('password')
+#     confirm_password = request.args.get('repassword')
+#     if not username or not email or not password:
+#         return make_response(f"Ensure all fields are filled!")
+#     EMAIL_REGEX = re.compile(r"[^@\s]+@[^@\s]+\.[a-zA-Z0-9]+$")
+#     if not EMAIL_REGEX.match(email):
+#         return make_response(f"Enter a valid email!")
+#     existing_user = User.query.filter(
+#         User.username == username or User.email == email
+#     ).first()
 
-    if existing_user:
-        return make_response(f'{username} ({email}) already created!')
-    if password != confirm_password:
-        return make_response(f"Passwords do not match!")
-    if len(password) < 5:
-        return make_response(f"Passwords must be longer than 5 characters!")
+#     if existing_user:
+#         return make_response(f'{username} ({email}) already created!')
+#     if password != confirm_password:
+#         return make_response(f"Passwords do not match!")
+#     if len(password) < 5:
+#         return make_response(f"Passwords must be longer than 5 characters!")
 
-    password_hash = generate_password_hash(password)
-    if username and email:
-        new_user = User(
-            username=username,
-            email=email,
-            created=dt.now(),
-            password=password_hash,
-            active=False,
-            admin=False
-        )
-        db.session.add(new_user)  # Adds new User record to database
-        db.session.commit()  # Commits all changes
-        return make_response(f"User successfully created! Login to continue")
-    else:
-        return make_response(f"A problem occurred during signup!")
+#     password_hash = generate_password_hash(password)
+#     if username and email:
+#         new_user = User(
+#             username=username,
+#             email=email,
+#             created=dt.now(),
+#             password=password_hash,
+#             active=False,
+#             admin=False
+#         )
+#         db.session.add(new_user)  # Adds new User record to database
+#         db.session.commit()  # Commits all changes
+#         return make_response(f"User successfully created! Login to continue")
+#     else:
+#         return make_response(f"A problem occurred during signup!")
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -160,18 +160,18 @@ The automation
 
 @app.route("/automate", methods=['POST', 'GET'])
 def start_messaging():
-    user = session.get('username')
-    try:
-        existing_user = User.query.filter(
-            User.username == user
-        ).first()
-        if not user:
-            return redirect(url_for("welcome"))
-        if existing_user.admin:
-            return redirect(url_for("admin"))
-    except BaseException as e:
-        session.pop('username', None)
-        return redirect(url_for("welcome"))
+    # user = session.get('username')
+    # try:
+    #     existing_user = User.query.filter(
+    #         User.username == user
+    #     ).first()
+    #     if not user:
+    #         return redirect(url_for("welcome"))
+    #     if existing_user.admin:
+    #         return redirect(url_for("admin"))
+    # except BaseException as e:
+    #     session.pop('username', None)
+    #     return redirect(url_for("welcome"))
     pid = request.args.get('pid')
     link = request.args.get('link')
     message = request.args.get('msg')

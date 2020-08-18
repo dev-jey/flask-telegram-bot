@@ -67,11 +67,11 @@
                 <div class="ml-auto"></div>
 
                 <!-- Navbar Items -->
-                <ul class="navbar-nav items">
+                <!-- <ul class="navbar-nav items">
                     <li class="nav-item">
                         <a href="#" class="nav-link" class="nav-link" data-toggle="modal" data-target="#sign">Login</a>
                     </li>
-                </ul>
+                </ul> -->
 
                 <!-- Navbar Icons -->
                 <!--
@@ -93,7 +93,7 @@
                 <ul class="navbar-nav action">
                     <li class="nav-item ml-3">
                         <a href="#" target="_blank" class="btn ml-lg-auto primary-button" class="nav-link"
-                            data-toggle="modal" data-target="#register"><i class="icon-rocket"></i>Register</a>
+                            data-toggle="modal" data-target="#sign"><i class="icon-rocket"></i>Login</a>
 
                     </li>
                 </ul>
@@ -281,7 +281,7 @@
     </div>
 
     <!-- Modal [register] -->
-    <div id="register" class="p-0 modal fade" role="dialog" aria-labelledby="register" aria-hidden="true">
+    <!-- <div id="register" class="p-0 modal fade" role="dialog" aria-labelledby="register" aria-hidden="true">
         <div class="modal-dialog modal-dialog-slideout" role="document">
             <div class="modal-content full">
                 <div class="modal-header" data-dismiss="modal">
@@ -329,7 +329,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
 
 
@@ -351,23 +351,23 @@
     <script src="/static/js/vendor/gallery.min.js"></script>
     <script src="/static/js/main.js"></script>
     <script>
-        function register() {
-            $("#return-message").html(``);
-            var username = $("#username").val();
-            var email = $("#email").val();
-            var password = $("#password").val();
-            var repassword = $("#repassword").val();
-            $.get("/register", { username: username, email: email, password: password, repassword: repassword })
-                .then(
-                    res => {
-                        $("#return-message").html(`Hi! <b>${res}</b>!`);
-                    })
-                .catch(err => {
-                    res => {
-                        $("#return-message").html(`Hi! <b>${err}</b>!`);
-                    }
-                })
-        }
+        // function register() {
+        //     $("#return-message").html(``);
+        //     var username = $("#username").val();
+        //     var email = $("#email").val();
+        //     var password = $("#password").val();
+        //     var repassword = $("#repassword").val();
+        //     $.get("/register", { username: username, email: email, password: password, repassword: repassword })
+        //         .then(
+        //             res => {
+        //                 $("#return-message").html(`Hi! <b>${res}</b>!`);
+        //             })
+        //         .catch(err => {
+        //             res => {
+        //                 $("#return-message").html(`Hi! <b>${err}</b>!`);
+        //             }
+        //         })
+        // }
 
         function login() {
             $("#return-login-message").html(``);
@@ -382,10 +382,10 @@
                         }
                     })
         }
-        $("#register-btn").click(function (e) {
-            e.preventDefault();
-            register();
-        })
+        // $("#register-btn").click(function (e) {
+        //     e.preventDefault();
+        //     register();
+        // })
         $("#login-btn").click(function (e) {
             e.preventDefault();
             login();
