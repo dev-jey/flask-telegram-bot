@@ -139,11 +139,11 @@ def register():
         return make_response(f"A problem occurred during signup!")
 
 
-@app.route('/login', methods=['POST', 'GET'])
+@app.route('/login', methods=['POST'])
 def login():
     """Login via query string parameters."""
-    user = request.args.get('user')
-    password = request.args.get('password')
+    user = request.form.get('user')
+    password = request.form.get('password')
     if not user or not password:
         return make_response(f"Ensure all fields are filled!")
     existing_user = User.query.filter(
@@ -154,7 +154,7 @@ def login():
     return make_response(f'Wrong credentials! Try again')
 
 
-@app.route('/logout', methods=['POST', 'GET'])
+@app.route('/logout')
 def logout():
     """Logout via query string parameters."""
     session.pop('username', None)
