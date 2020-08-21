@@ -96,6 +96,14 @@ class Process(db.Model):
         db.ForeignKey('users.id', ondelete='CASCADE'),
         nullable=False,
     )
+
+    on = db.Column(
+        db.Boolean,
+        index=False,
+        unique=False,
+        nullable=False
+    )
+
     created = db.Column(
         db.DateTime,
         index=False,

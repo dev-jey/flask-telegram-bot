@@ -77,8 +77,8 @@
                         <h6>Hi {{user}}!</h6>
                     </li>
                     <li class="nav-item ml-3">
-                        <a href="#" target="_blank" class="btn ml-lg-auto primary-button" class="nav-link" id="logout"
-                            data-toggle="modal" data-target="#logout"><i class="icon-rocket"></i>Logout</a>
+                        <a href="#" target="_blank" class="btn ml-lg-auto primary-button" class="nav-link" id="logout">
+                            <i class="icon-rocket"></i>Logout</a>
                     </li>
                 </ul>
             </div>
@@ -90,7 +90,9 @@
         <div class="container smaller">
 
             <br>
-            <h3>All Past Processes</h3>
+            <h3>All My Processes</h3>
+            <a href="/home" class="btn ml-lg-auto primary-button" class="nav-link" id="new">
+                New Process</a>
             <br>
             {% if processes %}
             <table class="table table-responsive-md table-bordered" style="color:white;border-collapse:collapse;">
@@ -99,8 +101,9 @@
                         <th>PID</th>
                         <th>Link</th>
                         <th>Message</th>
-                        <th>Repeat after every hr(s)</th>
+                        <th>Repeat after every Min(s)</th>
                         <th>Iterations so far</th>
+                        <th>Running?</th>
                         <th>Last Run On</th>
                         <th>Action</th>
                     </tr>
@@ -113,22 +116,115 @@
                         <td name="message" id="message">{{p.message}}</td>
                         <td name="duration" id="duration">{{p.duration}}</td>
                         <td>{{p.iterations}}</td>
-                        <td>{{p.created}}</td>
+                        <td>{{p.on}}</td>
+                        <td>{{p.created.strftime('%d-%m-%Y %H:%MHrs') }}</td>
                         <td>
-                            <button class="btn ml-lg-auto primary-button" class="nav-link" id="start" type="submit"><i
-                                    class="icon-load"></i>Restart</button></td>
+                            {% if p.on %}
+                            <button class="btn ml-lg-auto primary-button" class="nav-link" id="stop-btn" type="submit">
+                                Stop
+                            </button>
+                            {% else %}
+                            <button class="btn ml-lg-auto primary-button" class="nav-link" id="mobile-btn" type="submit"
+                                data-toggle="modal" data-id="{{p.id}}" data-target="#mobile"
+                                style="background-color: greenyellow; color: black;">
+                                Start
+                            </button>
+                            {% endif %}
+                        </td>
+
                     </tr>
                 </tbody>
                 {% endfor %}
             </table>
             {% else %}
-            <h6>No Past Processes currently!</h6>
+            <h6>No Processes currently!</h6>
             {% endif %}
 
             <br><br><br>
             <br><br><br>
             <br><br><br>
             <br><br><br>
+        </div>
+        <div id="mobile" class="p-0 modal fade" role="dialog" aria-labelledby="mobile" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-slideout" role="document">
+                <div class="modal-content full">
+                    <div class="modal-header" data-dismiss="modal">
+                        Phone Number Verification <i class="icon-close"></i>
+                    </div>
+                    <div class="modal-body">
+                        <form action="javascript:0" class="row">
+                            <div class="col-12 p-0 align-self-center">
+                                <div class="row">
+                                    <div class="col-12 p-0 pb-3">
+                                        <h4>Enter Mobile Number</h4>
+                                    </div>
+                                </div>
+                                <p id="processId" hidden></p>
+                                <div class="row">
+                                    <div class="col-12 p-0 input-group">
+                                        <input type="number" class="form-control" id="code" name="code"
+                                            style="text-align: right;" placeholder="Code" required>
+                                        <input type="number" class="form-control" id="mobile-no" name="mobile-no"
+                                            placeholder="Mobile No" required>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <p id="return-login-message" style="color: red;"></p>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 p-0 input-group align-self-center">
+                                        <button class="btn primary-button" id="send-code">Send
+                                            Verification Code</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="verify" class="p-0 modal fade" role="dialog" aria-labelledby="mobile" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-slideout" role="document">
+                <div class="modal-content full">
+                    <div class="modal-header" data-dismiss="modal">
+                        Phone Number Verification <i class="icon-close"></i>
+                    </div>
+                    <div class="modal-body">
+                        <form action="#" class="row">
+                            <div class="col-12 p-0 align-self-center">
+                                <div class="row">
+                                    <div class="col-12 p-0 pb-3">
+                                        <h4>Enter Verification Code</h4>
+                                    </div>
+                                </div>
+                                <p id="processId" hidden></p>
+                                <p style="color: red" id="respo"></p>
+                                <div class="row">
+                                    <div class="col-12 p-0 input-group">
+                                        <input type="number" class="form-control" id="verification" name="verification"
+                                            placeholder="Verification code" required>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <p id="error-msg" style="color: red;"></p>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 p-0 input-group align-self-center">
+                                        <input type="submit" id="back" data-toggle="modal" data-target="#mobile"
+                                            value="Back">
+                                        &nbsp;
+                                        <button class="btn primary-button" id="verify-btn"><i class="icon-login"></i>
+                                            Verify</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -177,23 +273,58 @@
             $.get("/logout")
         }
         function start_transactions() {
-            var pid = $("#pid").text();
-            var link = $("#link").text();;
-            var message = $("#message").text();;
-            var duration = $("#duration").text();;
-            $.get("/automate", { pid: pid, message: message, link: link, duration: duration }).then(res => {
-                window.location.reload();
-            }).then(res => {
-                console.log(res)
-            })
+            $("#respo").html(`<b style="color: green">Wait while the code is being send</b>`)
+            var code = $("#code").val();
+            var mobile_no = $("#mobile-no").val();
+            $('#mobile').modal('hide');
+            $('#verify').modal('show');
+            $.get("/automate", { code: code, mobile_no: mobile_no })
+                .then(res => {
+                    print(res)
+                    $("#respo").html(`<b>${res}</b>!`);
+                })
         }
+
+        function verify_code() {
+            $("#respo").html(`<b style="color: green">Wait For Process To Start (This can take a few minutes)</b>`)
+            var my_code = $("#verification").val();
+            var pid = $("#processId").val();
+            $.get("/verify", { my_code: my_code, pid: pid })
+                .then(res => {
+                    print(res)
+                    $("#respo").html(`<b>${res}</b>`)
+                })
+        }
+
+        function stopTransaction() {
+            var pid = $("#pid").val();
+            $.get("/stop", { pid: pid })
+        }
+
+        $(document).on("click", "#mobile-btn", function () {
+            var myProcessId = $(this).data('id');
+            $(".modal-body #processId").html(`${myProcessId}`);
+        });
         $("#logout").click(function (e) {
             e.preventDefault();
             logout();
             window.location.replace("/")
         })
-        $("#start").click(function () {
+        $("#send-code").click(function (e) {
+            e.preventDefault();
             start_transactions();
+        })
+        $("#verify-btn").click(e => {
+            e.preventDefault();
+            verify_code();
+        })
+        $("#stop-btn").click(e => {
+            e.preventDefault()
+            stopTransaction()
+        })
+        $("#back").click(e => {
+            e.preventDefault()
+            $('#verify').modal('hide');
         })
     </script>
 </body>
