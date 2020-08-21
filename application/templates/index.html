@@ -359,11 +359,11 @@
             $.post("/register", { username: username, email: email, password: password, repassword: repassword })
                 .then(
                     res => {
-                        $("#return-message").html(`Hi! <b>${res}</b>!`);
+                        $("#return-message").html(`<b>${res}</b>`);
                     })
                 .catch(err => {
                     res => {
-                        $("#return-message").html(`Hi! <b>${err}</b>!`);
+                        $("#return-message").html(`<b>${err}</b>`);
                     }
                 })
         }
@@ -375,7 +375,7 @@
             $.get("/login", { user: user, password: password })
                 .then(
                     res => {
-                        $("#return-login-message").html(`Hi! <b>${res}</b>!`);
+                        $("#return-login-message").html(`<b>${res}</b>`);
                         if (res == 'Login Successful') {
                             window.location.replace('/home');
                         }
