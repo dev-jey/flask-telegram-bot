@@ -29,13 +29,13 @@ options.add_argument("--headless")
 options.add_argument("--disable-setuid-sandbox") 
 options.add_argument("--remote-debugging-port=9222")
 options.add_argument("--disable-dev-shm-usage")
-# options.binary_location = environ.get('GOOGLE_CHROME_BIN')
+options.binary_location = environ.get('GOOGLE_CHROME_BIN')
 app.permanent_session_lifetime = datetime.timedelta(days=365)
 
 
 global driver
-# driver = webdriver.Chrome(executable_path=str(environ.get('CHROMEDRIVER_PATH')), options=options)
-driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+driver = webdriver.Chrome(executable_path=str(environ.get('CHROMEDRIVER_PATH')), options=options)
+# driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
 wait = WebDriverWait(driver, 10000)
 
 '''
