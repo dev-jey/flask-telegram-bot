@@ -223,6 +223,8 @@ def start_browser():
 def verify_code():
     try:
         my_code = request.args.get("my_code")
+        if not my_code:
+            return make_response(f"Enter a verification code")
         pid = request.args.get("pid")
         code_field = driver.find_element_by_xpath(
             "/html/body/div[1]/div/div[2]/div[2]/form/div[4]/input"
