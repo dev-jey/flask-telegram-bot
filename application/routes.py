@@ -4,6 +4,7 @@ from selenium.webdriver.chrome.options import Options
 import time
 import datetime
 import re
+import random
 from os import environ
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime as dt
@@ -28,12 +29,13 @@ options.add_argument("--headless")
 options.add_argument("--disable-setuid-sandbox") 
 options.add_argument("--remote-debugging-port=9222")
 options.add_argument("--disable-dev-shm-usage")
-options.binary_location = environ.get('GOOGLE_CHROME_BIN')
+# options.binary_location = environ.get('GOOGLE_CHROME_BIN')
 app.permanent_session_lifetime = datetime.timedelta(days=365)
 
 
 global driver
-driver = webdriver.Chrome(executable_path=str(environ.get('CHROMEDRIVER_PATH')), options=options)
+# driver = webdriver.Chrome(executable_path=str(environ.get('CHROMEDRIVER_PATH')), options=options)
+driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
 wait = WebDriverWait(driver, 10000)
 
 '''
@@ -231,7 +233,7 @@ def verify_code():
         ).send_keys(my_code)
         wait.until(
             lambda driver: driver.current_url == 'https://web.telegram.org/#/im')
-        time.sleep(5)
+        driver.implicitly_wait(5)
         process = Process.query.filter(
             Process.id == int(pid)
             ).first()
@@ -240,8 +242,9 @@ def verify_code():
             lambda driver: driver.current_url == process.link)
         if process.link == driver.current_url:
             new_process = update_process(pid)
+            iterations=0
             while True:
-                time.sleep(int(new_process.duration)*int(environ.get('TIME_MEASURE_SECONDS')))
+                time.sleep(random.randint(-9, 9) + int(new_process.duration)*int(environ.get('TIME_MEASURE_SECONDS')))
                 textarea = driver.find_element_by_xpath(
                     "/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div[3]/div[2]/div/div/div/form/div[2]/div[5]").send_keys(new_process.message)
                 driver.find_element_by_xpath(
@@ -253,20 +256,24 @@ def verify_code():
             driver.quit()
         return make_response(f"Process Started")
     except BaseException as e:
-        print(e)
+        print("Error: ",e)
         driver.close()
         driver.quit()
         return make_response(f"An error occured while starting process")
 
 @app.route('/stop')
 def stop_process():
-    pid = request.args.get("pid")
-    existing_process = Process.query.filter(
-        Process.id == int(pid)
-    ).first()
-    existing_process.on = False
-    driver.close()
-    driver.quit()
+    try:
+        pid = request.args.get("pid")
+        existing_process = Process.query.filter(
+            Process.id == int(pid)
+        ).first()
+        existing_process.on = False
+        driver.close()
+        driver.quit()
+        return make_response("Stopped")
+    except BaseException as e:
+        print(e)
 
 
 
@@ -298,6 +305,18 @@ def save_process():
     message = request.args.get('msg')
     duration = request.args.get('duration')
     user = session.get('username')
+    if not message and not link and not duration:
+        return make_response(f"All fields are required")
+    if not message:
+        return make_response(f"Enter a message")
+    if not link:
+        return make_response(f"Enter a link")
+    if not duration:
+        return make_response(f"Enter a duration")
+    if int(duration) < 30:
+        return make_response(f"Duration (minutes) must be more than 30")
+    if int(duration) > 3600:
+        return make_response(f"Duration (minutes) must be less than 3600")
     existing_user = User.query.filter(
         User.username == user
     ).first()
@@ -312,7 +331,7 @@ def save_process():
     )
     db.session.add(new_process)  # Adds new Process record to database
     db.session.commit()  # Commits all changes
-    return redirect(url_for("get_past_processes"))
+    return make_response(f"Process has been added successfully")
 
 def update_process(pid):
     user = session.get('username')

@@ -99,27 +99,27 @@
                     <p class="text-max-800">Enter the link to the person or group to send the message to.</p>
                 </div>
             </div>
-            <form id="leverage-simple-for"
-                class="leverage-simple-for">
+            <form id="leverage-simple-for" class="leverage-simple-for">
                 <!-- <input type="hidden" name="section" value="leverage_form"> -->
 
                 <!-- <input type="hidden" name="reCAPTCHA"> -->
-
                 <div class="row form-group-margin">
                     <div class="col-12 col-md-6 m-0 p-2 input-group">
-                        <input id="link" type="text" name="link" placeholder="Link e.g https://web.telegram.org/#/im?p=@kenyanacademicwriters" required
+                        <input id="link" type="text" name="link"
+                            placeholder="Link e.g https://web.telegram.org/#/im?p=@kenyanacademicwriters" required
                             class="form-control field-phone">
                     </div>
                     <div class="col-12 col-md-6 m-0 p-2 input-group">
                         <input id="duration" type="number" name="duration" placeholder="Duration in minutes"
-                            class="form-control field-phone" onkeydown="return event.keyCode !== 69" min="1" max="24" required>
+                            class="form-control field-phone" onkeydown="return event.keyCode !== 69" min="1" max="24"
+                            required>
                     </div>
                     <div class="col-12 m-0 p-2 input-group">
                         <textarea name="msg" id="msg" class="form-control field-message" placeholder="Message"
                             required></textarea>
                     </div>
                     <div class="col-12 col-12 m-0 pl-md-2">
-                        <span class="form-alert"></span>
+                        <p id="respo" style="color: red;"></p>
                     </div>
                     <div class="col-12 input-group m-0 p-2">
                         <input id="buttonInput" type="submit" value="Save Process">
@@ -182,13 +182,17 @@
             $.get("/logout")
         }
         function getBotResponse() {
+            $("#respo").html(`<b></b>`);
             var msg = $("#msg").val();
             var duration = $("#duration").val();
             var link = $("#link").val();
             $.get("/save_process", { msg: msg, duration: duration, link: link })
-            .then((res)=>{
-                window.location.replace("/processes")
-            })
+                .then((res) => {
+                    $("#respo").html(`<b>${res}</b>`);
+                    if (res == "Process has been added successfully") {
+                        window.location.replace("/processes");
+                    }
+                })
         }
         $("#logout").click(function (e) {
             e.preventDefault();

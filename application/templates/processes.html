@@ -120,7 +120,7 @@
                         <td>{{p.created.strftime('%d-%m-%Y %H:%MHrs') }}</td>
                         <td>
                             {% if p.on %}
-                            <button class="btn ml-lg-auto primary-button" class="nav-link" id="stop-btn" type="submit">
+                            <button class="btn ml-lg-auto primary-button" class="nav-link" id="stop-btn" type="submit" data-id="{{p.id}}">
                                 Stop
                             </button>
                             {% else %}
@@ -199,7 +199,7 @@
                                         <h4>Enter Verification Code</h4>
                                     </div>
                                 </div>
-                                <p id="processId" hidden></p>
+                                <p id="procesId" hidden></p>
                                 <p style="color: red" id="respo"></p>
                                 <div class="row">
                                     <div class="col-12 p-0 input-group">
@@ -278,9 +278,10 @@
             var mobile_no = $("#mobile-no").val();
             $('#mobile').modal('hide');
             $('#verify').modal('show');
+            var myProcessId = $(".modal-body #processId").text();
+            $(".modal-body #procesId").html(`${myProcessId}`);
             $.get("/automate", { code: code, mobile_no: mobile_no })
                 .then(res => {
-                    print(res)
                     $("#respo").html(`<b>${res}</b>!`);
                 })
         }
@@ -288,18 +289,22 @@
         function verify_code() {
             $("#respo").html(`<b style="color: green">Wait For Process To Start (This can take a few minutes)</b>`)
             var my_code = $("#verification").val();
-            var pid = $("#processId").val();
+            var pid = $("#procesId").text();
             $.get("/verify", { my_code: my_code, pid: pid })
                 .then(res => {
-                    print(res)
                     $("#respo").html(`<b>${res}</b>`)
+                    window.location.replace("/processes")
                 })
         }
 
-        function stopTransaction() {
-            var pid = $("#pid").val();
-            $.get("/stop", { pid: pid })
-        }
+        $(document).on("click", "#stop-btn", function () {
+            var myProcessId = $(this).data('id');
+            $.get("/stop", { pid: myProcessId }).then(res=>{
+                if(res == "Stopped"){
+                window.location.replace("/processes");
+                }
+            })
+        });
 
         $(document).on("click", "#mobile-btn", function () {
             var myProcessId = $(this).data('id');
@@ -317,10 +322,6 @@
         $("#verify-btn").click(e => {
             e.preventDefault();
             verify_code();
-        })
-        $("#stop-btn").click(e => {
-            e.preventDefault()
-            stopTransaction()
         })
         $("#back").click(e => {
             e.preventDefault()
