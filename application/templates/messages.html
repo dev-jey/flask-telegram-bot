@@ -1,0 +1,377 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block modals %}
+{{ super() }}
+<!--
+        Enter mobile number Modal
+    -->
+<section class="mobile-page" id="mobile-page">
+    <img src="{{ url_for('static', filename='images/circles.svg') }}" class="circles-img-modal" alt="Circles">
+    <div class="x" id="x-mobile">
+        <div class="close">
+            <div class="close-btn"></div>
+        </div>
+    </div>
+    <form class="mobile-form" method="POST">
+        <h1>Enter Mobile Number</h1>
+        <p>Enter your mobile number below. A verification code will be <br> sent immediately.</p><br>
+        <input required type="number" name="mobile" id="mobile" class="input-fields" placeholder="Mobile No"
+            onkeydown="javascript: return event.keyCode == 69 ? false : true"><br>
+        <input type="submit" name="mobile-submit" id="mobile-submit" class="btn submit-btn" value="Send Code"><br>
+    </form>
+</section>
+
+<!--
+        Enter verification code Modal
+    -->
+<section class="mobile-page" id="verify-page">
+    <img src="{{ url_for('static', filename='images/circles.svg') }}" class="circles-img-modal" alt="Circles">
+    <div class="x" id="x-verify">
+        <div class="close">
+            <div class="close-btn"></div>
+        </div>
+    </div>
+    <form class="mobile-form" method="POST">
+        <h1>Enter Verification Code</h1>
+        <p>Check your mobile phone for a <br> verification code.</p><br>
+        <input required type="number" name="mobile" id="verification" class="input-fields" placeholder="Verification No"
+            onkeydown="javascript: return event.keyCode == 69 ? false : true"><br>
+        <input type="submit" name="mobile-submit" id="verify-submit" class="btn submit-btn" value="Verify"><br>
+    </form>
+</section>
+{% endblock %}
+{% block mobilemenu %}
+<a class="profile-name">Savalijey</a>
+<a href="/" class="btn navbar__right-login" id="new-message">New message</a>
+<a href="/" class="btn navbar__right-login" id="my-messages">My messages</a>
+<a href="/" class="btn navbar__right-signup" id="logout-mobile">Logout</a>
+{% endblock %}
+{%   block navright %}
+
+<a href="" class="btn navbar__right-login my-messages-desktop" id="my-messages-desktop">Messages</a>
+<div class="dropdown">
+    <img src="{{ url_for('static', filename='images/person_outline.svg') }}" class="logout-icon" alt="">
+    <div class="dropdown-content">
+        <a href="/">Logout</a>
+    </div>
+</div>
+{%  endblock %}
+
+
+{% block content%}
+<section class="content-section-messages">
+
+    <div class="section-header">
+        <div class="section-title">
+            <h1>All Messages</h1>
+        </div>
+        <div class="section-title-button">
+            <a href="/" class="add-message">Add Message</a>
+        </div>
+    </div>
+
+    <div class="section-content">
+        <div class="card-container">
+            <div class="section-content__card">
+                <div class="flip-card-front">
+                    <p class="off"></p>
+                    <p class="on"></p>
+                    <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="">
+                    <span class="message-name">Gamblers</span>
+                    <p class="messages-sofar">12 Message(s) so far</p>
+                </div>
+                <div class="flip-card-back">
+                    <input type="submit" class="edit" id="edit" value="Edit">
+                    <input type="submit" class="delete" id="delete" value="Delete">
+                    <input type="submit" class="start-message" id="start-message" value="Start Message">
+
+                    <div class="flip-card-back__content">
+                        <h4>Gamblers</h4>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugiat non consequuntur
+                            minima saepe sint rerum molestiae asperiores accusamus minus esse neque assumenda
+                            molestias possimus deserunt a rem, mollitia ex ullam.
+                        </p>
+                        <label>Repeats: Every 5 Minute(s)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-container">
+            <div class="section-content__card">
+                <div class="flip-card-front">
+                    <p class="off"></p>
+                    <p class="on"></p>
+                    <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="">
+                    <span class="message-name">Gamblers</span>
+                    <p class="messages-sofar">12 Message(s) so far</p>
+                </div>
+                <div class="flip-card-back">
+                    <input type="submit" class="edit" id="edit" value="Edit">
+                    <input type="submit" class="delete" id="delete" value="Delete">
+                    <input type="submit" class="start-message" id="start-message" value="Start Message">
+
+                    <div class="flip-card-back__content">
+                        <h4>Gamblers</h4>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugiat non consequuntur
+                            minima saepe sint rerum molestiae asperiores accusamus minus esse neque assumenda
+                            molestias possimus deserunt a rem, mollitia ex ullam.
+                        </p>
+                        <label>Repeats: Every 5 Minute(s)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-container">
+            <div class="section-content__card">
+                <div class="flip-card-front">
+                    <p class="on"></p>
+                    <p class="off"></p>
+                    <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="">
+                    <span class="message-name">Gamblers</span>
+                    <p class="messages-sofar">1 Message(s) so far</p>
+                </div>
+                <div class="flip-card-back">
+                    <input type="submit" class="edit" id="edit" value="Edit">
+                    <input type="submit" class="delete" id="delete" value="Delete">
+                    <input type="submit" class="start-message" id="start-message" value="Start Message">
+
+                    <div class="flip-card-back__content">
+                        <h4>Gamblers</h4>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugiat non consequuntur
+                            minima saepe sint rerum molestiae asperiores accusamus minus esse neque assumenda
+                            molestias possimus deserunt a rem, mollitia ex ullam.
+                        </p>
+                        <label>Repeats: Every 5 Minute(s)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-container">
+            <div class="section-content__card">
+                <div class="flip-card-front">
+                    <p class="off"></p>
+                    <p class="on"></p>
+                    <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="">
+                    <span class="message-name">Gamblers</span>
+                    <p class="messages-sofar">12 Message(s) so far</p>
+                </div>
+                <div class="flip-card-back">
+                    <input type="submit" class="edit" id="edit" value="Edit">
+                    <input type="submit" class="delete" id="delete" value="Delete">
+                    <input type="submit" class="start-message" id="start-message" value="Start Message">
+
+                    <div class="flip-card-back__content">
+                        <h4>Gamblers</h4>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugiat non consequuntur
+                            minima saepe sint rerum molestiae asperiores accusamus minus esse neque assumenda
+                            molestias possimus deserunt a rem, mollitia ex ullam.
+                        </p>
+                        <label>Repeats: Every 5 Minute(s)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-container">
+            <div class="section-content__card">
+                <div class="flip-card-front">
+                    <p class="off"></p>
+                    <p class="on"></p>
+                    <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="">
+                    <span class="message-name">Gamblers</span>
+                    <p class="messages-sofar">12 Message(s) so far</p>
+                </div>
+                <div class="flip-card-back">
+                    <input type="submit" class="edit" id="edit" value="Edit">
+                    <input type="submit" class="delete" id="delete" value="Delete">
+                    <input type="submit" class="start-message" id="start-message" value="Start Message">
+
+                    <div class="flip-card-back__content">
+                        <h4>Gamblers</h4>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugiat non consequuntur
+                            minima saepe sint rerum molestiae asperiores accusamus minus esse neque assumenda
+                            molestias possimus deserunt a rem, mollitia ex ullam.
+                        </p>
+                        <label>Repeats: Every 5 Minute(s)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-container">
+            <div class="section-content__card">
+                <div class="flip-card-front">
+                    <p class="on"></p>
+                    <p class="off"></p>
+                    <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="">
+                    <span class="message-name">Gamblers</span>
+                    <p class="messages-sofar">10 Message(s) so far</p>
+                </div>
+                <div class="flip-card-back">
+                    <input type="submit" class="edit" id="edit" value="Edit">
+                    <input type="submit" class="delete" id="delete" value="Delete">
+                    <input type="submit" class="start-message" id="start-message" value="Start Message">
+
+                    <div class="flip-card-back__content">
+                        <h4>Gamblers</h4>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugiat non consequuntur
+                            minima saepe sint rerum molestiae asperiores accusamus minus esse neque assumenda
+                            molestias possimus deserunt a rem, mollitia ex ullam.
+                        </p>
+                        <label>Repeats: Every 5 Minute(s)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-container">
+            <div class="section-content__card">
+                <div class="flip-card-front">
+                    <p class="off"></p>
+                    <p class="on"></p>
+                    <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="">
+                    <span class="message-name">Gamblers</span>
+                    <p class="messages-sofar">12 Message(s) so far</p>
+                </div>
+                <div class="flip-card-back">
+                    <input type="submit" class="edit" id="edit" value="Edit">
+                    <input type="submit" class="delete" id="delete" value="Delete">
+                    <input type="submit" class="start-message" id="start-message" value="Start Message">
+
+                    <div class="flip-card-back__content">
+                        <h4>Gamblers</h4>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugiat non consequuntur
+                            minima saepe sint rerum molestiae asperiores accusamus minus esse neque assumenda
+                            molestias possimus deserunt a rem, mollitia ex ullam.
+                        </p>
+                        <label>Repeats: Every 5 Minute(s)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-container">
+            <div class="section-content__card">
+                <div class="flip-card-front">
+                    <p class="on"></p>
+                    <p class="off"></p>
+                    <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="">
+                    <span class="message-name">Gamblers</span>
+                    <p class="messages-sofar">0 Message(s) so far</p>
+                </div>
+                <div class="flip-card-back">
+                    <input type="submit" class="edit" id="edit" value="Edit">
+                    <input type="submit" class="delete" id="delete" value="Delete">
+                    <input type="submit" class="start-message" id="start-message" value="Start Message">
+
+                    <div class="flip-card-back__content">
+                        <h4>Gamblers</h4>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugiat non consequuntur
+                            minima saepe sint rerum molestiae asperiores accusamus minus esse neque assumenda
+                            molestias possimus deserunt a rem, mollitia ex ullam.
+                        </p>
+                        <label>Repeats: Every 5 Minute(s)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-container">
+            <div class="section-content__card">
+                <div class="flip-card-front">
+                    <p class="on"></p>
+                    <p class="off"></p>
+                    <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="">
+                    <span class="message-name">Gamblers</span>
+                    <p class="messages-sofar">0 Message(s) so far</p>
+                </div>
+                <div class="flip-card-back">
+                    <input type="submit" class="edit" id="edit" value="Edit">
+                    <input type="submit" class="delete" id="delete" value="Delete">
+                    <input type="submit" class="start-message" id="start-message" value="Start Message">
+
+                    <div class="flip-card-back__content">
+                        <h4>Gamblers</h4>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugiat non consequuntur
+                            minima saepe sint rerum molestiae asperiores accusamus minus esse neque assumenda
+                            molestias possimus deserunt a rem, mollitia ex ullam.
+                        </p>
+                        <label>Repeats: Every 5 Minute(s)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-container">
+            <div class="section-content__card">
+                <div class="flip-card-front">
+                    <p class="on"></p>
+                    <p class="off"></p>
+                    <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="">
+                    <span class="message-name">Gamblers</span>
+                    <p class="messages-sofar">0 Message(s) so far</p>
+                </div>
+                <div class="flip-card-back">
+                    <input type="submit" class="edit" id="edit" value="Edit">
+                    <input type="submit" class="delete" id="delete" value="Delete">
+                    <input type="submit" class="start-message" id="start-message" value="Start Message">
+
+                    <div class="flip-card-back__content">
+                        <h4>Gamblers</h4>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugiat non consequuntur
+                            minima saepe sint rerum molestiae asperiores accusamus minus esse neque assumenda
+                            molestias possimus deserunt a rem, mollitia ex ullam.
+                        </p>
+                        <label>Repeats: Every 5 Minute(s)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-container">
+            <div class="section-content__card">
+                <div class="flip-card-front">
+                    <p class="on"></p>
+                    <p class="off"></p>
+                    <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="">
+                    <span class="message-name">Gamblers</span>
+                    <p class="messages-sofar">0 Message(s) so far</p>
+                </div>
+                <div class="flip-card-back">
+                    <input type="submit" class="edit" id="edit" value="Edit">
+                    <input type="submit" class="delete" id="delete" value="Delete">
+                    <input type="submit" class="start-message" id="start-message" value="Start Message">
+
+                    <div class="flip-card-back__content">
+                        <h4>Gamblers</h4>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugiat non consequuntur
+                            minima saepe sint rerum molestiae asperiores accusamus minus esse neque assumenda
+                            molestias possimus deserunt a rem, mollitia ex ullam.
+                        </p>
+                        <label>Repeats: Every 5 Minute(s)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-container">
+            <div class="section-content__card">
+                <div class="flip-card-front">
+                    <p class="on"></p>
+                    <p class="off"></p>
+                    <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="">
+                    <span class="message-name">Gamblers</span>
+                    <p class="messages-sofar">0 Message(s) so far</p>
+                </div>
+                <div class="flip-card-back">
+                    <input type="submit" class="edit" id="edit" value="Edit">
+                    <input type="submit" class="delete" id="delete" value="Delete">
+                    <input type="submit" class="start-message" id="start-message" value="Start Message">
+
+                    <div class="flip-card-back__content">
+                        <h4>Gamblers</h4>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugiat non consequuntur
+                            minima saepe sint rerum molestiae asperiores accusamus minus esse neque assumenda
+                            molestias possimus deserunt a rem, mollitia ex ullam.
+                        </p>
+                        <label>Repeats: Every 5 Minute(s)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+{% endblock %}

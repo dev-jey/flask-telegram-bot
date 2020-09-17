@@ -29,13 +29,13 @@ options.add_argument("--headless")
 options.add_argument("--disable-setuid-sandbox") 
 options.add_argument("--remote-debugging-port=9222")
 options.add_argument("--disable-dev-shm-usage")
-options.binary_location = environ.get('GOOGLE_CHROME_BIN')
+# options.binary_location = environ.get('GOOGLE_CHROME_BIN')
 app.permanent_session_lifetime = datetime.timedelta(days=365)
 
 
 global driver
-driver = webdriver.Chrome(executable_path=str(environ.get('CHROMEDRIVER_PATH')), options=options)
-# driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+# driver = webdriver.Chrome(executable_path=str(environ.get('CHROMEDRIVER_PATH')), options=options)
+driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
 wait = WebDriverWait(driver, 10000)
 
 '''
@@ -62,7 +62,7 @@ def home():
         ).first()
         if existing_user.admin:
             return redirect(url_for("admin"))
-        return render_template("home.html", user=user, user_details=existing_user)
+        return render_template("messages.html", user=user, user_details=existing_user)
     except BaseException as e:
         session.pop('username', None)
         return redirect(url_for("welcome"))

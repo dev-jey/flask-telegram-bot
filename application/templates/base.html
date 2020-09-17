@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <title>{% block title %}{% endblock %} - Telegram TextBot</title>
+</head>
+
+<body>
+    {% block modals  %}
+    <!--
+        Blue Section
+    -->
+    <section class="blue"></section>
+    <img src="{{ url_for('static', filename='images/circles.svg') }}" class="circles-img-modal" alt="Circles">
+
+    <!--
+        Overlay for Modals
+    -->
+    <div class="mobile-cover" id="mobile-cover">
+    </div>
+
+    <!--
+        Mobile menu
+    -->
+    <div class="mobile-menu" id="mobile-menu">
+        <div class="x-menu" id="x-menu">
+            <div class="close">
+                <div class="close-btn"></div>
+            </div>
+        </div>
+        <div class="mobile__button-list">
+            {% block mobilemenu %}
+            <a href="/" class="btn navbar__right-login" id="login">Login</a>
+            <a href="/" class="btn navbar__right-signup" id="signup">Register</a>
+            {% endblock %}
+        </div>
+    </div>
+
+    {% endblock %}
+    <section class="main">
+        <header>
+            <nav class="navbar">
+                <div class="navbar__left">
+                    <a href="/" class="navbar__left-logo">Telegram <span>Textbot</span></a>
+                </div>
+                <div class="navbar__right">
+                    {% block navright %}
+
+                    <a href="" class="btn navbar__right-login" id="login-desktop">Login</a>
+                    <a href="" class="btn navbar__right-signup" id="signup-desktop">Register</a>
+
+                    {% endblock %}
+                </div>
+                <div class="ham" id="ham">
+
+                </div>
+            </nav>
+        </header>
+        {% block content %}{% endblock %}
+        <footer class="footer">
+            <div class="footer__left">
+                All Rights Reserved. <a href="/">Terms</a> and <a href="/">Conditions</a>.
+            </div>
+            <div class="footer__right">
+                &copy;<a href="https://dev-jey.github.io" target="_blank" class="footer__copyright"> DevJey </a>
+                <script>
+                    document.write(new Date().getFullYear())
+                </script>.
+            </div>
+        </footer>
+    </section>
+    <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+</body>
+
+</html>
