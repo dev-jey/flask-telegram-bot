@@ -10,9 +10,9 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime as dt
 from flask import Flask, render_template, request, redirect, url_for, flash, make_response, session,jsonify
 from flask import current_app as app
-from .models import db, User
+from .models import db, User, Message
 from .auth import sign_up
-from .messages import add_message, get_all_messages
+from .messages import add_message, get_all_messages, edit_message
 
 
 
@@ -140,6 +140,29 @@ def save_message():
     user = session.get('username')
     return add_message(name,message,duration, user)
 
+
+@app.route("/edit/<message_id>", methods=['GET'])
+def open_edit_message(message_id):
+    try:
+        message_details =   Message.query.filter(
+                Message.id == message_id
+            ).first()
+        return render_template('editmessage.html', message_details=message_details)
+    except BaseException  as e:
+        print(e)
+        return render_template('editmessage.html', message_details=None)
+
+
+
+@app.route("/edit_message", methods=['POST'])
+def edit_a_message():
+    data = request.get_json()
+    id_= data["id"]
+    name = data['name']
+    message = data['message']
+    duration = data['duration']
+    user = session.get('username')
+    return edit_message(name,message,duration, user,id_)
 
 
 

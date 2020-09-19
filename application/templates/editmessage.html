@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}New Message{% endblock %}
+{% block title %}Update Message{% endblock %}
 
 {% block mobilemenu %}
 <a class="profile-name">Savalijey</a>
@@ -20,16 +20,19 @@
 
 
 {% block content%}
+{% if message_details %}
 <section class="content-section">
     <div class="content-section__left content-section__left-faq">
         <div class="faq">
-            <h5 class="faq-title">Create a Message</h5>
-            <p>Add a message by adding a Channel/Group/User Name to send to, the time you want the message repeatedly
+            <h5 class="faq-title">Edit a Message</h5>
+            <p>Edit a message by adding a new Channel/Group/User Name to send to, the time you want the message
+                repeatedly
                 sent after, and the message to send.</p>
         </div>
         <div class="faq">
             <h5 class="faq-title">Start sending the message</h5>
-            <p>Go to Messages page, and find the specific message with the Channel/Group/User name. Click the Start Sending Button</p>
+            <p>Go to Messages page, and find the specific message with the Channel/Group/Username. Click the Start
+                Sending Button</p>
         </div>
         <div class="faq">
             <h5 class="faq-title">Verify your phone number</h5>
@@ -44,20 +47,31 @@
     </div>
     <div class="content-section__right">
 
-        <form class="add-form" id="add-form" method="POST">
+        <form class="edit-form" id="edit-form" method="POST">
             <h1>Enter Message Details</h1>
             <p>All fields are mandatory and necessary for a <br> message to wor correctly. Pay attention to <br>
                 specific instructions.</p><br>
-            <input type="text" name="group-name" id="group-name" class="input-fields"
-                placeholder="Channel or Group or Username"><br>
-            <input type="number" name="duration" id="duration" class="input-fields"
-                onkeydown="javascript: return event.keyCode == 69 ? false : true" placeholder="Duration"><br>
+            <input type="text" id="idStore" value="{{message_details.id}}" hidden>
+            <input type="text" name="group-name-edit" id="group-name-edit" class="input-fields"
+                value="{{message_details.name}}" placeholder="Channel or Group or Username"><br>
+            <input type="number" name="duration-edit" id="duration-edit" class="input-fields"
+                value="{{message_details.duration}}" onkeydown="javascript: return event.keyCode == 69 ? false : true"
+                placeholder="Duration"><br>
 
-            <textarea name="message" id="message" cols="30" rows="6" placeholder="Message"></textarea>
+            <textarea name="message-edit" id="message-edit" cols="30" rows="6"
+                placeholder="Message">{{message_details.message}}</textarea>
 
-            <input type="submit" name="add-submit" id="add-submit" class="btn submit-btn" value="Add Message"><br>
+            <input type="submit" name="edit-submit" id="edit-submit" class="btn submit-btn" value="Update Message"><br>
         </form>
 
     </div>
 </section>
+{% else %}
+<div class="verified-msg">
+    <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="" class="verified-logo">
+    Message cannot be found
+    <br>
+    <a href="/home" class="back-to-main-site">View All Messages</a>
+</div>
+{% endif %}
 {% endblock %}

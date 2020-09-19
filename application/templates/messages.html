@@ -92,9 +92,9 @@
                     <p class="messages-sofar">{{message.iterations}} Message(s) sent so far</p>
                 </div>
                 <div class="flip-card-back">
-                    <input type="submit" class="edit" id="edit" value="Edit">
-                    <input type="submit" class="delete" id="delete" value="Delete">
-                    <input type="submit" class="start-message" id="start-message" value="Start Message">
+                    <input type="button" class="edit editselect" id="{{message.id}}" value="Edit">
+                    <input type="button" class="delete" id="{{message.id}}" value="Delete">
+                    <input type="button" class="start-message" id="start-message{{message.id}}" value="Start Sending">
 
                     <div class="flip-card-back__content">
                         <h4>{{message.name|truncate(30)}}</h4>

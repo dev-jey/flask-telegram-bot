@@ -379,3 +379,52 @@ function saveMessage() {
 
 
 
+/**
+ * Edit message form
+ */
+$(".editselect").click(function (e) {
+    e.preventDefault();
+    var messageId = e.target.id;
+    window.location.replace(`/edit/${messageId}`);
+});
+
+/**
+ * Edit form submission
+ */
+$("#edit-form").submit(function  (e){
+    e.preventDefault();
+    editMessage(e);
+})
+
+function editMessage(e){
+    var id =$("#idStore").attr("value");
+    var message = $("#message-edit").val();
+    var duration = $("#duration-edit").val();
+    var name = $("#group-name-edit").val();
+    console.log(name,message,duration);
+    $.ajax({
+        url: "/edit_message",
+        type: "POST",
+        contentType: "application/json",
+        crossDomain: true,
+        global: true,
+        data: JSON.stringify({ message: message, duration: duration, name: name, id:id }),
+        success: function (data) {
+            displayAlert('success');
+            $("#return-message").html(data);
+            setTimeout(function(){
+                window.location.replace("/home");
+            }, 500);
+        },
+        error: function (error) {
+            displayAlert('error');
+            $("#return-message").html(error.responseText);
+        },
+        beforeSend: function () {
+            $("#edit-submit").prop({ "disabled": true, "value": "Loading" });
+        },
+        complete: function () {
+            $("#edit-submit").prop({ "disabled": false, "value": "Add Message" });
+        }
+    });
+}

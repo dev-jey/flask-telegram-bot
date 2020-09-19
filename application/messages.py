@@ -62,6 +62,31 @@ def add_message(name,message,duration,user):
         return make_response(f"Message has not been added. Try again", 401)
 
 
+
+def edit_message(name,message,duration,user,id_):
+    try:
+        invalidForm = validateAddForm(name, duration, message)
+        if invalidForm:
+            return invalidForm
+        existing_user = User.query.filter(
+            User.username == user
+        ).first()
+        existing_message = Message.query.filter(
+            Message.id == id_  and Message.owner ==  existing_user.id
+        ).first()
+        existing_message.message=message,
+        existing_message.name=name,
+        existing_message.created=dt.datetime.now(),
+        existing_message.duration=duration
+        db.session.commit()  # Commits all changes
+        return make_response(f"Message has been updated successfully", 200)
+    except Exception as e:
+        print(e)
+        return make_response(f"Message has not been updated. Try again", 401)
+
+
+
+
 def validateAddForm(name, duration, message):
     invalid = False
     if name == ""  or name is None:
@@ -89,7 +114,7 @@ def get_all_messages(user):
     try:
         messages = Message.query.filter(
             Message.owner == user.id
-        ).all()
+        ).order_by(Message.created.desc()).all()
         return messages
     except BaseException as e:
         print(e)
