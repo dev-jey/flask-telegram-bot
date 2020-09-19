@@ -424,7 +424,7 @@ function editMessage(e){
             $("#edit-submit").prop({ "disabled": true, "value": "Loading" });
         },
         complete: function () {
-            $("#edit-submit").prop({ "disabled": false, "value": "Add Message" });
+            $("#edit-submit").prop({ "disabled": false, "value": "Update Message" });
         }
     });
 }
