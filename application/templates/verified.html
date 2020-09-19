@@ -37,11 +37,11 @@
     <form class="signup-form" id="signup-form" method="POST">
         <h1>Register</h1>
         <p>Create an account to start enjoying our <br>services.</p><br>
-        <input required type="text" name="name-signup" id="name-signup" class="input-fields" placeholder="Username"><br>
-        <input required type="email" name="email-signup" id="email-signup" class="input-fields" placeholder="Email"><br>
-        <input required type="password" name="password-signup" id="password-signup" class="input-fields" placeholder="Password"><br>
-        <input required type="password" name="repassword-signup" id="repassword-signup" class="input-fields" placeholder="Confirm Password"><br>
-        <input type="button" name="signup-submit" id="signup-submit" class="btn submit-btn" value="Signup"><br>
+        <input  type="text" name="name-signup" id="name-signup" class="input-fields" placeholder="Username"><br>
+        <input  type="email" name="email-signup" id="email-signup" class="input-fields" placeholder="Email"><br>
+        <input  type="password" name="password-signup" id="password-signup" class="input-fields" placeholder="Password"><br>
+        <input  type="password" name="repassword-signup" id="repassword-signup" class="input-fields" placeholder="Confirm Password"><br>
+        <input type="submit" name="signup-submit" id="signup-submit" class="btn submit-btn" value="Signup"><br>
 
         <p>Already have an account?<br>
             <a href="" id="login-link">Login</a> here.</p><br>
@@ -51,6 +51,9 @@
 {% block content %}
     <div class="verified-msg">
         <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="" class="verified-logo">
+        {% if username %}
+            <h3>Welcome {{username}}</b>,</h3>
+        {% endif %}
         {{msg}}
         <br>
         <input type="submit" id="go-to-login" value="Click here to Login">

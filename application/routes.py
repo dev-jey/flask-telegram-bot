@@ -132,8 +132,8 @@ def activate_account(token):
             return render_template("verified.html", msg=msg)
         existing_user.active = True
         db.session.commit()
-        msg = f"Welcome {username},\n Your account has been activated successfully"
-        return render_template("verified.html", msg=msg)
+        msg = f"Your account has been activated successfully"
+        return render_template("verified.html", msg=msg, username=username)
     
     except BaseException as e:
         print(e)

@@ -742,10 +742,16 @@ h1,h2,h3,h4,h5,h6{
     align-content: center;
     justify-content: center;
     margin: auto;
-    font-weight: bold;
+    font-weight: normal;
     height: calc(100vh - 12rem);
     max-width: 500px;
     width: 100%;
+}
+.verified-msg h3{
+    padding-bottom: .5rem;
+}
+.verified-msg h3 b{
+    color:var(--main-bg-color) !important;
 }
 #go-to-login, .back-to-main-site{
     margin:auto;
