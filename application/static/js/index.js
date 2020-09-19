@@ -212,7 +212,7 @@ function register() {
  * Alert display
  */
 function displayAlert(state) {
-    $("#return-message").css({ "opacity": 1, "width": "400px", "visibility": "visible", "display": "block" })
+    $("#return-message").css({ "opacity": 1, "width": "93%", "visibility": "visible", "display": "block" })
         .delay(3000).fadeOut('slow');
     if (state == "error") {
         $("#return-message").css("border-left", "6px solid red");
@@ -240,27 +240,27 @@ function isValidDetails(username, email, password, repassword) {
     if (!username) {
         displayAlert('error');
         $("#return-message").html("Enter a username");
-        return True;
+        return true;
     }
     if (!email) {
         displayAlert('error');
         $("#return-message").html("Enter an email");
-        return True;
+        return true;
     }
     if (!password) {
         displayAlert('error');
         $("#return-message").html("Enter a password");
-        return True;
+        return true;
     }
     if (!repassword) {
         displayAlert('error');
         $("#return-message").html("Confirm your password");
-        return True;
+        return true;
     }
     if (password != repassword) {
         displayAlert('error');
         $("#return-message").html("Passwords do not match");
-        return True;
+        return true;
     }
 }
 
@@ -296,7 +296,9 @@ function login() {
         success: function (data) {
             displayAlert('success');
             $("#return-message").html(data);
-            window.location.replace("/home");
+            setTimeout(function(){
+                window.location.replace("/home");
+            }, 500);
         },
         error: function (error) {
             displayAlert('error');
@@ -358,7 +360,9 @@ function saveMessage() {
         success: function (data) {
             displayAlert('success');
             $("#return-message").html(data);
-            window.location.replace("/home");
+            setTimeout(function(){
+                window.location.replace("/home");
+            }, 500);
         },
         error: function (error) {
             displayAlert('error');
@@ -373,9 +377,5 @@ function saveMessage() {
     });
 }
 
-
-/**
- * Get all  messages
- */
 
 
