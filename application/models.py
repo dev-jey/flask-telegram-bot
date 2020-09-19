@@ -49,6 +49,13 @@ class User(db.Model):
         nullable=False
     )
 
+    paid = db.Column(
+        db.Boolean,
+        index=False,
+        unique=False,
+        nullable=False
+    )
+
     def __repr__(self):
         return '<User {}>'.format(self.username)
 

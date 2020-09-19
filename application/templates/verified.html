@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}Verification{% endblock %}
 {% block modals %}
 {{ super() }}
 <!--
@@ -37,11 +37,11 @@
     <form class="signup-form" id="signup-form" method="POST">
         <h1>Register</h1>
         <p>Create an account to start enjoying our <br>services.</p><br>
-        <input  type="text" name="name-signup" id="name-signup" class="input-fields" placeholder="Username"><br>
-        <input  type="email" name="email-signup" id="email-signup" class="input-fields" placeholder="Email"><br>
-        <input  type="password" name="password-signup" id="password-signup" class="input-fields" placeholder="Password"><br>
-        <input  type="password" name="repassword-signup" id="repassword-signup" class="input-fields" placeholder="Confirm Password"><br>
-        <input type="submit" name="signup-submit" id="signup-submit" class="btn submit-btn" value="Signup"><br>
+        <input required type="text" name="name-signup" id="name-signup" class="input-fields" placeholder="Username"><br>
+        <input required type="email" name="email-signup" id="email-signup" class="input-fields" placeholder="Email"><br>
+        <input required type="password" name="password-signup" id="password-signup" class="input-fields" placeholder="Password"><br>
+        <input required type="password" name="repassword-signup" id="repassword-signup" class="input-fields" placeholder="Confirm Password"><br>
+        <input type="button" name="signup-submit" id="signup-submit" class="btn submit-btn" value="Signup"><br>
 
         <p>Already have an account?<br>
             <a href="" id="login-link">Login</a> here.</p><br>
@@ -49,21 +49,10 @@
 </section>
 {% endblock %}
 {% block content %}
-
-<section class="content-section">
-    <div class="content-section__left">
-        <h1>
-            Automate
-        </h1>
-        <p>
-            Broadcast your messages to different groups or channels automatically.
-            Telegram Textbot will ease your work and give you more time to do productive work
-        </p>
+    <div class="verified-msg">
+        <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="" class="verified-logo">
+        {{msg}}
         <br>
-        <a href="/" class="btn navbar__right-signup" id="signup-main">Create Account Now</a>
+        <input type="submit" id="go-to-login" value="Click here to Login">
     </div>
-    <div class="content-section__right">
-        <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="logo" id="tele-logo">
-    </div>
-</section>
 {% endblock %}

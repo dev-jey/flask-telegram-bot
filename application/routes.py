@@ -4,11 +4,14 @@ from selenium.webdriver.chrome.options import Options
 import time
 import datetime
 import re
+import json
+import os
+import jwt
 import random
 from os import environ
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime as dt
-from flask import Flask, render_template, request, redirect, url_for, flash, make_response, session
+from flask import Flask, render_template, request, redirect, url_for, flash, make_response, session,jsonify
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -16,6 +19,7 @@ from flask import current_app as app
 from .models import db, User, Process
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
+from .auth import sign_up
 
 
 
@@ -35,8 +39,8 @@ app.permanent_session_lifetime = datetime.timedelta(days=365)
 
 global driver
 # driver = webdriver.Chrome(executable_path=str(environ.get('CHROMEDRIVER_PATH')), options=options)
-driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
-wait = WebDriverWait(driver, 10000)
+# driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+# wait = WebDriverWait(driver, 10000)
 
 '''
 All the Pages in the app
@@ -104,41 +108,38 @@ User authentication views
 @app.route('/register', methods=['POST'])
 def register():
     """Create a user via query string parameters."""
-    username = request.form.get('username')
-    email = request.form.get('email')
-    password = request.form.get('password')
-    confirm_password = request.form.get('repassword')
-    if not username or not email or not password:
-        return make_response(f"Ensure all fields are filled!")
-    EMAIL_REGEX = re.compile(r"[^@\s]+@[^@\s]+\.[a-zA-Z0-9]+$")
-    if not EMAIL_REGEX.match(email):
-        return make_response(f"Enter a valid email!")
-    existing_user = User.query.filter(
-        User.username == username or User.email == email
-    ).first()
+    data = request.get_json()
+    username = data['username']
+    email = data['email']
+    password = data['password']
+    confirm_password = data['repassword']
+    response = sign_up(username, email, password, confirm_password)
+    return response
 
-    if existing_user:
-        return make_response(f'{username} ({email}) already created!')
-    if password != confirm_password:
-        return make_response(f"Passwords do not match!")
-    if len(password) < 5:
-        return make_response(f"Passwords must be longer than 5 characters!")
 
-    password_hash = generate_password_hash(password)
-    if username and email:
-        new_user = User(
-            username=username,
-            email=email,
-            created=dt.now(),
-            password=password_hash,
-            active=False,
-            admin=False
-        )
-        db.session.add(new_user)  # Adds new User record to database
-        db.session.commit()  # Commits all changes
-        return make_response(f"User successfully created! Login to continue")
-    else:
-        return make_response(f"A problem occurred during signup!")
+
+@app.route('/verify/<token>', methods=['GET'])
+def activate_account(token):
+    try:
+        email = jwt.decode(token, os.environ.get('SECRET_KEY'))['email']
+        existing_user = User.query.filter(
+            User.email == email
+        ).first()
+        username = jwt.decode(token, os.environ.get('SECRET_KEY'))['username']
+        msg = ""
+        if existing_user.active:
+            msg = f"User {username} already verified"
+            return render_template("verified.html", msg=msg)
+        existing_user.active = True
+        db.session.commit()
+        msg = f"Welcome {username},\n Your account has been activated successfully"
+        return render_template("verified.html", msg=msg)
+    
+    except BaseException as e:
+        print(e)
+        msg = f"The activation link is either broken or expired"
+        return render_template("verified.html", msg=msg)
+
 
 
 @app.route('/login', methods=['POST'])

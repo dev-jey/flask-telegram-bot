@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}Page Not Found{% endblock %}
 
 {% block mobilemenu %}
 
@@ -12,7 +12,12 @@
 {% block content%}
 
 
-<h1 style="text-align: center;">404 Page Not Found</h1>
+<div class="verified-msg">
+    <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="" class="verified-logo">
+    404: Page Not Found
+    <br>
+    <a href="/" class="back-to-main-site">Go Back Home</a>
+</div>
 
 
 {% endblock %}  

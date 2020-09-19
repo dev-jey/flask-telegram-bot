@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}Internal Server Error{% endblock %}
 
 {% block mobilemenu %}
 
@@ -12,7 +12,11 @@
 {% block content%}
 
 
-<h1 style="text-align: center;">500  Internal Server Error</h1>
-
+<div class="verified-msg">
+    <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="" class="verified-logo">
+    500: Internal Server Error
+    <br>
+    <a href="/" class="back-to-main-site">Go Back Home</a>
+</div>
 
 {% endblock %}  

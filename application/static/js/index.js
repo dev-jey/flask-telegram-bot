@@ -1,193 +1,277 @@
 
 
 //Login Button Click
-var login = document.getElementById("login");
-login && login.addEventListener("click", function (e) {
+$("#login").click(function (e) {
     closeMenu(e);
     openLogin(e);
 });
 
 // Start message
-var messageBtn = document.getElementById("start-message");
-messageBtn && messageBtn.addEventListener("click", function(e){
+$("#start-message").click(function (e) {
     openMobileForm(e);
 })
 
-var mobileSubmitBtn = document.getElementById("mobile-submit");
-mobileSubmitBtn  && mobileSubmitBtn.addEventListener("click", function(e){
+$("#mobile-submit").click(function (e) {
     closeMobile(e);
     openVerifyPage(e);
 })
 
-
-// var verifyBtn = document.getElementById("verify-submit");
-// verifyBtn  && verifyBtn.addEventListener("click", function(e){
+//$("#verify-submit").click(function(e){
 //     closeVerifyPage(e);
 // })
 
 
 
-var loginDesktop = document.getElementById("login-desktop");
-loginDesktop && loginDesktop.addEventListener("click", function (e) {
+$("#login-desktop").click(function (e) {
     openLogin(e);
 });
 
 // Mobile close
-
-var xMobile = document.getElementById("x-mobile");
-xMobile && xMobile.addEventListener("click", function (e) {
+$("#x-mobile").click(function (e) {
     closeMobile(e);
 });
 
 // Verify Close
-var xVerify = document.getElementById("x-verify");
-xVerify && xVerify.addEventListener("click", function (e) {
+$("#x-verify").click(function (e) {
     closeVerifyPage(e);
 });
 
 //Login close
-var x = document.getElementById("x");
-x && x.addEventListener("click", function (e) {
+$("#x").click(function (e) {
     closeLogin(e);
 });
 
 //signup close
-var xSignup = document.getElementById("x-signup");
-xSignup && xSignup.addEventListener("click", function (e) {
+$("#x-signup").click(function (e) {
     closeSignup(e);
 });
 
 //Signup Button Click
-var signup = document.getElementById("signup");
-signup && signup.addEventListener("click", function (e) {
+$("#signup").click(function (e) {
     closeMenu(e);
     openSignup(e);
 });
-const callToAction = document.getElementById("signup-desktop");
-callToAction && callToAction.addEventListener("click", function (e) {
+
+$("#signup-desktop").click(function (e) {
     openSignup(e);
 });
 
-var signupMain = document.getElementById("signup-main");
-signupMain && signupMain.addEventListener("click", function (e) {
+$("#signup-main").click(function (e) {
     openSignup(e);
 });
+
+
 // Toggle Menu
-var ham = document.getElementById("ham");
-ham && ham.addEventListener("click", function (e) {
+$("#ham").click(function (e) {
     openMenu(e);
 });
 
-var xMenu = document.getElementById("x-menu");
-xMenu && xMenu.addEventListener("click", function (e) {
+$("#x-menu").click(function (e) {
     closeMenu(e);
 });
 
 
-var mobileCover = document.getElementById("mobile-cover");
-mobileCover && mobileCover.addEventListener("click", function (e) {
+$("#mobile-cover").click(function (e) {
     closeMenu(e);
 });
 
 //Open signup
-var signupLink = document.getElementById("signup-link");
-signupLink && signupLink.addEventListener("click", function (e) {
+$("#signup-link").click(function (e) {
     closeLogin(e);
     openSignup(e);
 })
 
-var loginLink = document.getElementById("login-link");
-loginLink && loginLink.addEventListener("click", function (e) {
+$("#login-link").click(function (e) {
     closeSignup(e);
     openLogin(e);
 })
 
+$("#go-to-login").click(function (e) {
+    openLogin(e)
+})
 
 // Functions
-function openMobileForm(e){
+function openMobileForm(e) {
     e.preventDefault();
-    document.getElementById("mobile-page").classList.add("show");
-    document.getElementById("x-mobile").style.display = "block";
+    $("#mobile-page").addClass("show");
+    $("#x-mobile").css("display", "block");
 }
 
-function openVerifyPage(e){
+function openVerifyPage(e) {
     e.preventDefault();
-    document.getElementById("verify-page").classList.add("show");
-    document.getElementById("x-verify").style.display ="block";
+    $("#verify-page").addClass("show");
+    $("#x-verify").css("display", "block");
 }
 
 function openSignup(e) {
     e.preventDefault();
-    document.getElementById("signup-page").classList.add('show');
-    document.getElementById("x-signup").style.display = "block";
+    $("#signup-page").addClass("show");
+    $("#x-signup").css("display", "block");
 }
 
 function openLogin(e) {
     e.preventDefault();
-    document.getElementById("login-page").classList.add('show');
-    document.getElementById("x").style.display = "block";
+    $("#login-page").addClass("show");
+    $("#x").css("display", "block");
 }
 
 function openMenu(e) {
     e.preventDefault();
-    document.getElementById("mobile-cover").classList.add('show');
-    document.getElementById("mobile-menu").classList.add('show');
-    document.getElementById("x-menu").style.display = "block";
+    $("#mobile-cover").addClass("show");
+    $("#mobile-menu").addClass("show");
+    $("#x-menu").css("display", "block");
 }
 
 function closeSignup(e) {
     e.preventDefault();
-    document.getElementById("signup-page").classList.remove('show');
-    document.getElementById("x-signup").style.display = "none";
+    $("#signup-page").removeClass("show");
+    $("#x-signup").css("display", "none");
 }
 
 function closeLogin(e) {
     e.preventDefault();
-    document.getElementById("login-page").classList.remove('show');
-    document.getElementById("x").style.display = "none";
+    $("#login-page").removeClass("show");
+    $("#x").css("display", "none");
 }
 function closeMenu(e) {
     e.preventDefault();
-    document.getElementById("mobile-cover").classList.remove('show');
-    document.getElementById("mobile-menu").classList.remove('show');
-    document.getElementById("x-menu").style.display = "none";
+    $("#mobile-cover").removeClass("show");
+    $("#mobile-menu").removeClass("show");
+    $("#x-menu").css("display", "none");
 }
 
 function closeMobile(e) {
     e.preventDefault();
-    document.getElementById("mobile-page").classList.remove('show');
-    document.getElementById("x-mobile").style.display = "none";
+    $("#mobile-page").removeClass("show");
+    $("#x-mobile").css("display", "none");
 }
 
-function closeVerifyPage(e){
+function closeVerifyPage(e) {
     e.preventDefault();
-    document.getElementById("verify-page").classList.remove("show");
-    document.getElementById("x-verify").style.display ="none";
+    $("#verify-page").removeClass("show");
+    $("#x-verify").css("display", "none");
 }
 
 
+/**
+ * Global loader function
+ */
+$(document).bind("ajaxSend", function () {
+    $('#loading').show();
+}).bind("ajaxComplete", function () {
+    $("#loading").hide();
+});
 
 
 
-// Login & Register
+
+/**
+ * Signup submit
+ */
+$("#signup-form").submit(function (e) {
+    e.preventDefault();
+    register();
+})
 function register() {
     $("#return-message").html(``);
-    var username = $("#username").val();
-    var email = $("#email").val();
-    var password = $("#password").val();
-    var repassword = $("#repassword").val();
-    $.post("/register", { username: username, email: email, password: password, repassword: repassword })
-        .then(
-            res => {
-                $("#return-message").html(`<b>${res}</b>`);
-            })
-        .catch(err => {
-            res => {
-                $("#return-message").html(`<b>${err}</b>`);
-            }
-        })
+    var username = $("#name-signup").val();
+    var email = $("#email-signup").val();
+    var password = $("#password-signup").val();
+    var repassword = $("#repassword-signup").val();
+    if (isValidDetails(username, email, password, repassword)) {
+        return;
+    }
+    $.ajax({
+        url: "/register",
+        type: "POST",
+        contentType: "application/json",
+        crossDomain: true,
+        global: true,
+        data: JSON.stringify({ username: username, email: email, password: password, repassword: repassword }),
+        success: function (data) {
+            displayAlert('success');
+            $("#return-message").html(data);
+        },
+        error: function (error) {
+            displayAlert('error');
+            $("#return-message").html(error.responseText);
+        },
+        beforeSend: function () {
+            $("#signup-submit").prop({ "disabled": true, "value": "Loading" });
+        },
+        complete: function () {
+            $("#signup-submit").prop({ "disabled": false, "value": "Signup" });
+        }
+    });
 }
 
+
+
+/**
+ * 
+ * @param {*} state 
+ * Alert display
+ */
+function displayAlert(state) {
+    $("#return-message").css({ "opacity": 1, "width": "400px", "visibility": "visible", "display": "block" })
+        .delay(3000).fadeOut('slow');
+    if (state == "error") {
+        $("#return-message").css("border-left", "6px solid red");
+    }
+    if (state == "success") {
+        $("#return-message").css("border-left", "6px solid green");
+    }
+    if (state == "info") {
+        $("#return-message").css("border-left", "6px solid #039BE5");
+    }
+}
+
+
+
+/**
+ * 
+ * @param {*} username 
+ * @param {*} email 
+ * @param {*} password 
+ * @param {*} repassword 
+ * Frontend validations to increase speed for the UI
+ * 
+ */
+function isValidDetails(username, email, password, repassword) {
+    if (!username) {
+        displayAlert('error');
+        $("#return-message").html("Enter a username");
+        return True;
+    }
+    if (!email) {
+        displayAlert('error');
+        $("#return-message").html("Enter an email");
+        return True;
+    }
+    if (!password) {
+        displayAlert('error');
+        $("#return-message").html("Enter a password");
+        return True;
+    }
+    if (!repassword) {
+        displayAlert('error');
+        $("#return-message").html("Confirm your password");
+        return True;
+    }
+    if (password != repassword) {
+        displayAlert('error');
+        $("#return-message").html("Passwords do not match");
+        return True;
+    }
+}
+
+
+
+
+$("#login-btn").click(function (e) {
+    e.preventDefault();
+    login();
+})
 function login() {
     $("#return-login-message").html(``);
     var user = $("#user").val();
@@ -201,20 +285,13 @@ function login() {
                 }
             })
 }
-$("#register-btn").click(function (e) {
-    e.preventDefault();
-    register();
-})
-$("#login-btn").click(function (e) {
-    e.preventDefault();
-    login();
-})
 
 
 
-function logout() {
-    $.get("/logout")
-}
+
+
+
+
 function getBotResponse() {
     $("#respo").html(`<b></b>`);
     var msg = $("#msg").val();
@@ -230,7 +307,7 @@ function getBotResponse() {
 }
 $("#logout").click(function (e) {
     e.preventDefault();
-    logout();
+    $.get("/logout")
     window.location.replace("/")
 })
 $("#buttonInput").click(function (e) {
