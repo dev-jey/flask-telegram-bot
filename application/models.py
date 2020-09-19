@@ -1,8 +1,9 @@
 """Data models."""
 from application.factory import db
+from flask_login import UserMixin
 
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     """Data model for user accounts."""
 
     __tablename__ = 'users'
@@ -42,7 +43,7 @@ class User(db.Model):
         unique=False,
         nullable=False
     )
-    active = db.Column(
+    activated = db.Column(
         db.Boolean,
         index=False,
         unique=False,
@@ -56,8 +57,26 @@ class User(db.Model):
         nullable=False
     )
 
+    authenticated = db.Column(db.Boolean, default=False)
+
+    def is_active(self):
+        """True, as all users are active."""
+        return True
+
+    def get_id(self):
+        """Return the email address to satisfy Flask-Login's requirements."""
+        return self.email
+
+    def is_authenticated(self):
+        """Return True if the user is authenticated."""
+        return self.authenticated
+
+    def is_anonymous(self):
+        """False, as anonymous users aren't supported."""
+        return False
+
     def __repr__(self):
-        return '<User {}>'.format(self.username)
+        return '<User {}>'.format(self.email)
 
 
 class Message(db.Model):
@@ -82,7 +101,7 @@ class Message(db.Model):
         index=False,
         unique=False,
         nullable=False
-    )   
+    )
 
     iterations = db.Column(
         db.Integer,
@@ -91,14 +110,14 @@ class Message(db.Model):
         nullable=False
     )
 
-    name= db.Column(
+    name = db.Column(
         db.Text,
         index=False,
         unique=False,
         nullable=False
     )
 
-    owner =  db.Column(
+    owner = db.Column(
         db.Integer,
         db.ForeignKey('users.id', ondelete='CASCADE'),
         nullable=False,
@@ -117,6 +136,6 @@ class Message(db.Model):
         unique=False,
         nullable=False
     )
-    
+
     def __repr__(self):
         return '<PID: {}>'.format(self.id)

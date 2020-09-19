@@ -2,9 +2,10 @@ from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 import datetime as dt
-from flask import Flask, render_template, request, redirect, url_for, flash, make_response, session,jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, make_response,jsonify
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from flask_login import login_required, current_user
 from selenium.webdriver.support import expected_conditions as EC
 from flask import current_app as app
 from .models import db, User, Message
@@ -42,9 +43,6 @@ def add_message(name,message,duration,user):
         invalidForm = validateAddForm(name, duration, message)
         if invalidForm:
             return invalidForm
-        existing_user = User.query.filter(
-            User.username == user
-        ).first()
         new_process = Message(
             message=message,
             name=name,
@@ -52,7 +50,7 @@ def add_message(name,message,duration,user):
             duration=duration,
             iterations=0,
             on=False,
-            owner=existing_user.id
+            owner=current_user.id
         )
         db.session.add(new_process)  # Adds new Message record to database
         db.session.commit()  # Commits all changes
@@ -68,11 +66,8 @@ def edit_message(name,message,duration,user,id_):
         invalidForm = validateAddForm(name, duration, message)
         if invalidForm:
             return invalidForm
-        existing_user = User.query.filter(
-            User.username == user
-        ).first()
         existing_message = Message.query.filter(
-            Message.id == id_  and Message.owner ==  existing_user.id
+            Message.id == id_  and Message.owner ==  current_user.id
         ).first()
         existing_message.message=message,
         existing_message.name=name,
@@ -130,20 +125,8 @@ def get_all_messages(user):
 
 
 @app.route("/automate", methods=['GET'])
+@login_required
 def start_messaging():
-    user = session.get('username')
-    try:
-        existing_user = User.query.filter(
-            User.username == user
-        ).first()
-        if not user:
-            return redirect(url_for("welcome"))
-        if existing_user.admin:
-            return redirect(url_for("admin"))
-    except BaseException as e:
-        print(e)
-        session.pop('username', None)
-        return redirect(url_for("welcome"))
     return start_browser()
 
 
@@ -226,23 +209,6 @@ def verify_code():
 
 
 
-def update_process(pid):
-    user = session.get('username')
-    existing_user = User.query.filter(
-        User.username == user
-    ).first()
-    existing_process = Process.query.filter(
-        Process.id == pid
-    ).first()
-    existing_process.created = dt.now()
-    existing_process.iterations = 0
-    existing_process.on = True
-    db.session.commit()
-    return existing_process
-
-
-
-
 
 @app.route('/stop')
 def stop_process():
@@ -257,27 +223,5 @@ def stop_process():
         return make_response("Stopped")
     except BaseException as e:
         print(e)
-
-
-
-
-@app.route('/processes', methods=['GET'])
-def get_past_processes():
-    user = session.get('username')
-    if not user:
-        return redirect(url_for("welcome"))
-    try:
-        existing_user = User.query.filter(
-            User.username == user
-        ).first()
-        if existing_user.admin:
-            return redirect(url_for("admin"))
-        processes = Process.query.filter(
-            Process.owner == existing_user.id
-        ).all()
-        return render_template('processes.html', user_details=existing_user, user=user, processes=processes)
-    except BaseException as e:
-        session.pop('username', None)
-        return redirect(url_for("welcome"))
 
 

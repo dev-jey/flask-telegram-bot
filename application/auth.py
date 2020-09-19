@@ -25,7 +25,8 @@ def sign_up(username, email, password, confirm_password):
             email=email.lower(),
             created=dt.now(),
             password=password_hash,
-            active=False,
+            activated=False,
+            authenticated=False,
             paid=False,
             admin=False
         )

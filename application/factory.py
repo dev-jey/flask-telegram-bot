@@ -1,8 +1,12 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from celery import Celery
+from flask_login import LoginManager
 from config import Config
 from .celery_config import init_celery
+
+login_manager = LoginManager()
+
 
 db = SQLAlchemy()
 
@@ -16,6 +20,7 @@ def create_app(app_name = __name__, **kwargs):
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.config.from_object('config.Config')
     db.init_app(app)
+    login_manager.init_app(app)
 
     with app.app_context():
         from . import routes  # Import routes
