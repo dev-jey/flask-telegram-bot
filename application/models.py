@@ -60,10 +60,10 @@ class User(db.Model):
         return '<User {}>'.format(self.username)
 
 
-class Process(db.Model):
-    """Data model for running processes."""
+class Message(db.Model):
+    """Data model for running messages."""
 
-    __tablename__ = 'processes'
+    __tablename__ = 'messages'
     __table_args__ = {'extend_existing': True}
 
     id = db.Column(
@@ -71,7 +71,7 @@ class Process(db.Model):
         primary_key=True
     )
     message = db.Column(
-        db.String(64),
+        db.Text,
         index=False,
         unique=False,
         nullable=False
@@ -91,8 +91,8 @@ class Process(db.Model):
         nullable=False
     )
 
-    link= db.Column(
-        db.String(64),
+    name= db.Column(
+        db.Text,
         index=False,
         unique=False,
         nullable=False

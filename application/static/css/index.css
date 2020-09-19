@@ -8,10 +8,10 @@
     --text-muted:rgb(160, 160, 160);
 }
 ::selection {
-    background: var(--main-bg-color); 
+    background: rgba(3, 155, 229, .3); 
   }
   ::-moz-selection {
-    background: var(--main-bg-color); 
+    background: rgba(3, 155, 229, .3); 
   }
 
 :disabled{
@@ -360,6 +360,8 @@ h1,h2,h3,h4,h5,h6{
     transition: transform 1s;
     transform-style: preserve-3d;
     width: 100%;    
+    max-width: 220px;
+    margin-right: auto;
     height: 280px;
 }
 
@@ -652,6 +654,7 @@ h1,h2,h3,h4,h5,h6{
         font-weight: normal;
         padding: .5rem;
         resize: none;
+        white-space: pre-wrap;
     }
 
   .add-form .input-fields:focus, .add-form  textarea:focus{

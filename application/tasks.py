@@ -12,8 +12,8 @@ mail = Mail(app)
 def send_activation_email(username, email):
     msg = Message('Telegram Textbot - Account verification required', sender = os.environ.get('MAIL_USERNAME'), recipients = [email])
     payload = {
-        'email': email,
-        'username': username,
+        'email': email.lower(),
+        'username': username.lower(),
         'exp': datetime.utcnow() + timedelta(minutes=60)
     }
     token = jwt.encode(payload, os.environ.get('SECRET_KEY'),

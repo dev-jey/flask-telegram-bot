@@ -21,8 +21,8 @@ def sign_up(username, email, password, confirm_password):
             return already_existing
         password_hash = generate_password_hash(password)
         new_user = User(
-            username=username,
-            email=email,
+            username=username.lower(),
+            email=email.lower(),
             created=dt.now(),
             password=password_hash,
             active=False,
@@ -40,10 +40,12 @@ def sign_up(username, email, password, confirm_password):
 '''Signup Validations'''
 def validate(username, email, password, confirm_password):
     resp = False
+    username = username.lower()
+    email = email.lower()
     if username == "" or  not username:
         resp = True
         return make_response("Enter a username", 400)
-    if len(username) < 4:
+    if len(username) < 3:
         resp = True
         return make_response("Username is too short", 400)
     
@@ -73,6 +75,8 @@ def validate(username, email, password, confirm_password):
 '''Check if username or email is already in use'''
 def verify_existing(username, email):
     resp = False
+    username = username.lower()
+    email = email.lower()
     try:
         existing_username = User.query.filter(
             User.username == username

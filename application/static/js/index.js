@@ -266,7 +266,9 @@ function isValidDetails(username, email, password, repassword) {
 
 
 
-
+/**
+ * Login form submit functionality
+ */
 $("#login-form").submit(function (e) {
     e.preventDefault();
     login();
@@ -309,13 +311,11 @@ function login() {
     });
 }
 
-$("#login-form").submit(function (e) {
-    e.preventDefault();
-    login();
-})
 
 
-
+/**
+ * Logout functionality
+ */
 $("#logout").click(function (e) {
     logout(e);
 })
@@ -323,7 +323,7 @@ $("#logout-mobile").click(function (e) {
     logout(e);
 })
 
-function logout(e){
+function logout(e) {
     e.preventDefault();
     $.ajax({
         url: "/logout",
@@ -337,33 +337,45 @@ function logout(e){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-function getBotResponse() {
-    $("#respo").html(`<b></b>`);
-    var msg = $("#msg").val();
+/**
+ * Save message functionality
+ */
+$("#add-form").submit(function (e) {
+    e.preventDefault();
+    saveMessage();
+})
+function saveMessage() {
+    var message = $("#message").val();
     var duration = $("#duration").val();
-    var link = $("#link").val();
-    $.get("/save_process", { msg: msg, duration: duration, link: link })
-        .then((res) => {
-            $("#respo").html(`<b>${res}</b>`);
-            if (res == "Process has been added successfully") {
-                window.location.replace("/processes");
-            }
-        })
+    var name = $("#group-name").val();
+    $.ajax({
+        url: "/save_message",
+        type: "POST",
+        contentType: "application/json",
+        crossDomain: true,
+        global: true,
+        data: JSON.stringify({ message: message, duration: duration, name: name }),
+        success: function (data) {
+            displayAlert('success');
+            $("#return-message").html(data);
+            window.location.replace("/home");
+        },
+        error: function (error) {
+            displayAlert('error');
+            $("#return-message").html(error.responseText);
+        },
+        beforeSend: function () {
+            $("#add-submit").prop({ "disabled": true, "value": "Loading" });
+        },
+        complete: function () {
+            $("#add-submit").prop({ "disabled": false, "value": "Add Message" });
+        }
+    });
 }
 
-$("#buttonInput").click(function (e) {
-    e.preventDefault();
-    getBotResponse();
-})
+
+/**
+ * Get all  messages
+ */
+
+
