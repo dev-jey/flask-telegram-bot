@@ -181,6 +181,7 @@ def start_messaging():
         if existing_user.admin:
             return redirect(url_for("admin"))
     except BaseException as e:
+        print(e)
         session.pop('username', None)
         return redirect(url_for("welcome"))
     return start_browser()

@@ -1,16 +1,11 @@
 import re
 import os
-import jwt
-from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash
 from datetime import datetime as dt
 from flask import make_response, render_template
 from flask import current_app as app
-from flask_mail import Mail, Message
 from .models import User, db
-
-
-mail = Mail(app)
+from application.tasks import send_activation_email
 
 
 '''
@@ -100,20 +95,8 @@ def verify_existing(username, email):
 '''Send account verification email'''
 def account_verification_email_send(username, email):
     try:
-        msg = Message('Telegram Textbot - Account verification required', sender = os.environ.get('MAIL_USERNAME'), recipients = [email])
-        payload = {
-            'email': email,
-            'username': username,
-            'exp': datetime.utcnow() + timedelta(minutes=60)
-        }
-        token = jwt.encode(payload, os.environ.get('SECRET_KEY'),
-                           algorithm='HS256').decode('utf-8')
-        link = os.environ.get('CURRENT_URL') + \
-            f"verify/{token}"
-        
-        msg.html =  render_template('activation.html', title = 'Verify Your Account', username=username,link=link)
-        mail.send(msg)
-        return make_response(f"We've sent an email to {email}. Open it to activate your account.", 200)
+        send_activation_email.delay(username, email)
+        return make_response(f"We've sent an email to {email}. Open it to activate your account. May take up to 5mins", 200)
     except BaseException as e:
         print("Email sending failed: ", e)
         return make_response(f"We experienced a problem sending an account activation email to you.", 400)

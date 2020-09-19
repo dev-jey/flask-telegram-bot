@@ -26,3 +26,7 @@ class Config:
     MAIL_PASSWORD = environ.get('MAIL_PASSWORD')
     MAIL_USE_TLS = False
     MAIL_USE_SSL = True
+
+    #Background tasks
+    CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+    CELERY_BROKER_URL = 'redis://localhost:6379'

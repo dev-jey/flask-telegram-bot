@@ -1,5 +1,5 @@
 """Data models."""
-from . import db
+from application.factory import db
 
 
 class User(db.Model):

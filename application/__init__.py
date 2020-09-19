@@ -1,19 +1,12 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from celery import Celery
+from config import Config
 
-db = SQLAlchemy()
+def make_celery(app=__name__):
+    redis_uri = Config.CELERY_BROKER_URL
+    return Celery(
+        app,
+        backend=redis_uri,
+        broker=redis_uri
+    )
 
-
-def create_app():
-    """Construct the core application."""
-    app = Flask(__name__, instance_relative_config=False)
-    app.config['TEMPLATES_AUTO_RELOAD'] = True
-    app.config.from_object('config.Config')
-
-    db.init_app(app)
-
-    with app.app_context():
-        from . import routes  # Import routes
-        db.create_all()  # Create sql tables for our data models
-
-        return app
+celery = make_celery()
