@@ -5,24 +5,24 @@
 <!--
         Login Modal
     -->
-<section class="login-page" id="login-page">
-    <img src="{{ url_for('static', filename='images/circles.svg') }}" class="circles-img-modal" alt="Circles">
-    <div class="x" id="x">
-        <div class="close">
-            <div class="close-btn"></div>
+    <section class="login-page" id="login-page">
+        <img src="{{ url_for('static', filename='images/circles.svg') }}" class="circles-img-modal" alt="Circles">
+        <div class="x" id="x">
+            <div class="close">
+                <div class="close-btn"></div>
+            </div>
         </div>
-    </div>
-    <form class="login-form" method="POST">
-        <h1>Login</h1>
-        <p>Log into your account to start using our <br>services.</p><br>
-        <input required type="email" name="email" id="email" class="input-fields" placeholder="Email"><br>
-        <input required type="password" name="" id="password" class="input-fields" placeholder="Password"><br>
-        <input type="submit" name="login-submit" id="login-submit" class="btn submit-btn" value="Login"><br>
-
-        <p>Do not have an account?<br>
-            <a href="" id="signup-link">Register</a> here.</p><br>
-    </form>
-</section>
+        <form class="login-form" id="login-form" method="POST">
+            <h1>Login</h1>
+            <p>Log into your account to start using our <br>services.</p><br>
+            <input type="text" name="email" id="email" class="input-fields" placeholder="Username or email"><br>
+            <input type="password" name="" id="password" class="input-fields" placeholder="Password"><br>
+            <input type="submit" name="login-submit" id="login-submit" class="btn submit-btn" value="Login"><br>
+    
+            <p>Do not have an account?<br>
+                <a href="" id="signup-link">Register</a> here.</p><br>
+        </form>
+    </section>
 
 <!--
         Signup Modal

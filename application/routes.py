@@ -55,7 +55,7 @@ def welcome():
     return render_template("index.html")
 
 
-@app.route('/home', methods=['POST', 'GET'])
+@app.route('/home', methods=['GET'])
 def home():
     user = session.get('username')
     if not user:
@@ -145,16 +145,23 @@ def activate_account(token):
 @app.route('/login', methods=['POST'])
 def login():
     """Login via query string parameters."""
-    user = request.form.get('user')
-    password = request.form.get('password')
+    data = request.get_json()
+    user = data['email']
+    password = data['password']
     if not user or not password:
-        return make_response(f"Ensure all fields are filled!")
-    existing_user = User.query.filter(
+        return make_response(f"Enter your username/email and password", 400)
+    existing_username = None
+    existing_email = None
+    existing_email = User.query.filter(
         User.email == user).first()
-    if existing_user and check_password_hash(existing_user.password, password):
-        session['username'] = existing_user.username
-        return make_response(f'Login Successful')
-    return make_response(f'Wrong credentials! Try again')
+    existing_username = User.query.filter(
+        User.username == user).first()
+    if existing_username or existing_email:
+        user = existing_username or existing_email
+        if check_password_hash(user.password, password):
+            session['username'] = user.username
+            return make_response(f'Login Successful', 200)
+    return make_response(f'Wrong credentials! Try again', 403)
 
 
 @app.route('/logout')

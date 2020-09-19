@@ -173,7 +173,6 @@ $("#signup-form").submit(function (e) {
     register();
 })
 function register() {
-    $("#return-message").html(``);
     var username = $("#name-signup").val();
     var email = $("#email-signup").val();
     var password = $("#password-signup").val();
@@ -268,23 +267,81 @@ function isValidDetails(username, email, password, repassword) {
 
 
 
-$("#login-btn").click(function (e) {
+$("#login-form").submit(function (e) {
     e.preventDefault();
     login();
 })
 function login() {
-    $("#return-login-message").html(``);
-    var user = $("#user").val();
-    var password = $("#passwd").val();
-    $.post("/login", { user: user, password: password })
-        .then(
-            res => {
-                $("#return-login-message").html(`<b>${res}</b>`);
-                if (res == 'Login Successful') {
-                    window.location.replace('/home');
-                }
-            })
+    var email = $("#email").val();
+    var password = $("#password").val();
+    if (!email) {
+        displayAlert('error');
+        $("#return-message").html("Enter your email");
+        return;
+    }
+    if (!password) {
+        displayAlert('error');
+        $("#return-message").html("Enter your password");
+        return;
+    }
+    $.ajax({
+        url: "/login",
+        type: "POST",
+        contentType: "application/json",
+        crossDomain: true,
+        global: true,
+        data: JSON.stringify({ email: email, password: password }),
+        success: function (data) {
+            displayAlert('success');
+            $("#return-message").html(data);
+            window.location.replace("/home");
+        },
+        error: function (error) {
+            displayAlert('error');
+            $("#return-message").html(error.responseText);
+        },
+        beforeSend: function () {
+            $("#login-submit").prop({ "disabled": true, "value": "Loading" });
+        },
+        complete: function () {
+            $("#login-submit").prop({ "disabled": false, "value": "Login" });
+        }
+    });
 }
+
+$("#login-form").submit(function (e) {
+    e.preventDefault();
+    login();
+})
+
+
+
+$("#logout").click(function (e) {
+    logout(e);
+})
+$("#logout-mobile").click(function (e) {
+    logout(e);
+})
+
+function logout(e){
+    e.preventDefault();
+    $.ajax({
+        url: "/logout",
+        type: "GET",
+        crossDomain: true,
+        global: true
+    });
+    window.location.replace("/")
+}
+
+
+
+
+
+
+
+
+
 
 
 
@@ -305,11 +362,7 @@ function getBotResponse() {
             }
         })
 }
-$("#logout").click(function (e) {
-    e.preventDefault();
-    $.get("/logout")
-    window.location.replace("/")
-})
+
 $("#buttonInput").click(function (e) {
     e.preventDefault();
     getBotResponse();
