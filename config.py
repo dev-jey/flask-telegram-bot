@@ -28,5 +28,5 @@ class Config:
     MAIL_USE_SSL = True
 
     #Background tasks
-    CELERY_RESULT_BACKEND = 'redis://localhost:6379'
-    CELERY_BROKER_URL = 'redis://localhost:6379'
+    CELERY_RESULT_BACKEND = environ.get('REDIS_URL')
+    CELERY_BROKER_URL = environ.get('REDIS_URL')
