@@ -857,7 +857,43 @@ h1,h2,h3,h4,h5,h6{
       }
   }
 
+/**
+* Activation email formatting
+*/
+.activation-email{
+    max-width: 350px;
+    width: 100%;
+    border: solid 1px var(--main-bg-color);
+    border-radius: 5px;
+    height: 100%;
+}
 
+.activation-email h1{
+    background: var(--main-bg-color);
+    color: #fff;
+}
+
+.activation-email p{
+    padding: 1rem;
+    font-weight: normal;
+    font-size: .8rem;
+}
+
+.activation-email a{
+    background: var(--main-bg-color);
+    color: #fff;
+    border-radius: 5px;
+    font-size: 14px;
+    padding: .5rem 1.5rem;
+    transition: background .5s;
+}
+
+
+.activation-email a:hover{
+    color: var(--main-bg-color);
+    background: #fff;
+    border: 1px solid var(--main-bg-color);
+}
 
 /**
 * Mobile Settings
