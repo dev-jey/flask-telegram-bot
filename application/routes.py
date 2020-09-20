@@ -14,7 +14,7 @@ from flask_login import login_required, logout_user, current_user, login_user
 from .factory import login_manager
 from .models import db, User, Message
 from .auth import sign_up
-from .messages import add_message, get_all_messages, edit_message
+from .messages import add_message, get_all_messages, edit_message, send_verification_code
 
 
 
@@ -178,6 +178,18 @@ def edit_a_message():
     duration = data['duration']
     user = current_user
     return edit_message(name,message,duration, user,id_)
+
+
+
+
+
+@app.route("/send_code", methods=['POST'])
+@login_required
+def send_code():
+    return send_verification_code()
+
+
+
 
 
 @login_manager.user_loader

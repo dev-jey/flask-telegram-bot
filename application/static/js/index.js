@@ -6,16 +6,6 @@ $("#login").click(function (e) {
     openLogin(e);
 });
 
-// Start message
-$("#start-message").click(function (e) {
-    openMobileForm(e);
-})
-
-$("#mobile-submit").click(function (e) {
-    closeMobile(e);
-    openVerifyPage(e);
-})
-
 //$("#verify-submit").click(function(e){
 //     closeVerifyPage(e);
 // })
@@ -93,6 +83,7 @@ $("#go-to-login").click(function (e) {
 // Functions
 function openMobileForm(e) {
     e.preventDefault();
+    $(".pid").html(e.target.id);
     $("#mobile-page").addClass("show");
     $("#x-mobile").css("display", "block");
 }
@@ -401,7 +392,6 @@ function editMessage(e){
     var message = $("#message-edit").val();
     var duration = $("#duration-edit").val();
     var name = $("#group-name-edit").val();
-    console.log(name,message,duration);
     $.ajax({
         url: "/edit_message",
         type: "POST",
@@ -425,6 +415,61 @@ function editMessage(e){
         },
         complete: function () {
             $("#edit-submit").prop({ "disabled": false, "value": "Update Message" });
+        }
+    });
+}
+
+/**
+ * Send code to Mobile
+ */
+// Start message
+$(".start-message").click(function (e) {
+    openMobileForm(e);
+})
+
+$("#mobile-form").submit(function (e) {
+    sendVerificationCode(e);
+})
+
+function sendVerificationCode(e){
+    e.preventDefault();
+    var mobileNo = $("#mobile").val();
+    var code = $("#code").val();
+    if(!code){
+        displayAlert('error');
+        $("#return-message").html("Enter a valid country number");
+        return;
+    }
+    if(!mobileNo){
+        displayAlert('error');
+        $("#return-message").html("Enter a mobile number");
+        return;
+    }
+   
+    $.ajax({
+        url: "/send_code",
+        type: "POST",
+        contentType: "application/json",
+        crossDomain: true,
+        global: true,
+        data: JSON.stringify({ code: code, mobile: mobileNo}),
+        success: function (data) {
+            displayAlert('success');
+            $("#return-message").html(data);
+            setTimeout(function(){
+                closeMobile();
+                openVerifyPage();
+            }, 500);
+        },
+        error: function (error) {
+            displayAlert('error');
+            $("#return-message").html(error.responseText);
+        },
+        beforeSend: function () {
+            $("#mobile-submit").prop({ "disabled": true, "value": "Loading" });
+        },
+        complete: function () {
+            $("#mobile-submit").prop({ "disabled": false, "value": "Send Code" });
         }
     });
 }

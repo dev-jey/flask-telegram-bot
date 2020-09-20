@@ -12,10 +12,13 @@
             <div class="close-btn"></div>
         </div>
     </div>
-    <form class="mobile-form" method="POST">
+    <form class="mobile-form" id="mobile-form" method="POST">
         <h1>Enter Mobile Number</h1>
-        <p>Enter your mobile number below. A verification code will be <br> sent immediately.</p><br>
-        <input required type="number" name="mobile" id="mobile" class="input-fields" placeholder="Mobile No"
+        <p>Enter your mobile number below. A verification code will be <br> sent to your mobile phone (Either in the telegram <br> mobile app or text messages)</p><br>
+        <p class="pid" hidden></p>
+        <input type="number" name="code" id="code" class="input-fields" placeholder="+254"
+            onkeydown="javascript: return event.keyCode == 69 ? false : true">
+        <input type="number" name="mobile" id="mobile" class="input-fields" placeholder="Mobile no"
             onkeydown="javascript: return event.keyCode == 69 ? false : true"><br>
         <input type="submit" name="mobile-submit" id="mobile-submit" class="btn submit-btn" value="Send Code"><br>
     </form>
@@ -94,7 +97,7 @@
                 <div class="flip-card-back">
                     <input type="button" class="edit editselect" id="{{message.id}}" value="Edit">
                     <input type="button" class="delete" id="{{message.id}}" value="Delete">
-                    <input type="button" class="start-message" id="start-message{{message.id}}" value="Start Sending">
+                    <input type="button" class="start-message" id="{{message.id}}" value="Start Sending">
 
                     <div class="flip-card-back__content">
                         <h4>{{message.name|truncate(30)}}</h4>
