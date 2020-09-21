@@ -21,10 +21,10 @@
     border:none;
     color: #fff;
 }
-
 html {
     height: 100%;
-    box-sizing: border-box;
+    box-sizing: border-box;    
+    font-family: 'Ubuntu', 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva', 'Verdana', sans-serif;
 }
 
 *,
@@ -38,7 +38,6 @@ body {
     margin: 0;
     padding-bottom: 2rem;
     min-height: 100%;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 a {
@@ -47,7 +46,8 @@ a {
 }
 h1,h2,h3,h4,h5,h6{
     padding:0;
-    margin:0;
+    margin:0;    
+    font-family: 'Ubuntu', 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva', 'Verdana';
 }
 
 .circles-img, .circles-img-modal{
@@ -264,7 +264,6 @@ h1,h2,h3,h4,h5,h6{
     font-size: .8rem;
     line-height: 25px;
     color: var(--text-muted);
-    letter-spacing: .05ch;
     padding-top: 1rem;
 }
 
@@ -562,14 +561,14 @@ h1,h2,h3,h4,h5,h6{
     margin-top: 2rem;
     width: 100%;
 }
-.faq h5{
+.faq h3{
     margin-bottom: -1rem;
     position: relative;
     margin-left: 3rem;
 }
 
 
-.faq h5::after{
+.faq h3::after{
     content: "";
     position: absolute;
     width: 10px;
@@ -583,7 +582,7 @@ h1,h2,h3,h4,h5,h6{
 .faq p{
     margin-left: 3.3rem;
     position: relative;
-    color: var(--text-muted);
+    font-size: .65rem;
 }
 
 
@@ -617,8 +616,8 @@ h1,h2,h3,h4,h5,h6{
       height: 40px;
       border-radius: 4px;
       padding-left: .5rem;
-      box-sizing: border-box;
-  }
+      box-sizing: border-box;    
+    }
 
 
   .login-form  p, .signup-form  p, .mobile-form p{
@@ -627,7 +626,7 @@ h1,h2,h3,h4,h5,h6{
 }
 .add-form p, .edit-form p{
     padding-top: .25rem;
-    font-size: .8rem;
+    font-size: .7rem;
     color: var(--text-muted);
 }
 
@@ -650,7 +649,6 @@ h1,h2,h3,h4,h5,h6{
   
   .add-form  textarea, .edit-form textarea{
       height: 100% !important;
-      font-family: "Helvetica Neue", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         font-weight: normal;
         padding: .5rem;
         resize: none;
@@ -678,8 +676,12 @@ h1,h2,h3,h4,h5,h6{
       cursor: pointer;     
       height: 40px; 
       margin:auto;
-      transition: background .5s, color .5s;
+      transition: background .5s, color .5s;   
   }
+
+  input{
+    font-family: 'Ubuntu', 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva', 'Verdana', sans-serif;
+}
 
   .submit-btn:hover{
     background: linear-gradient(to right, rgba(255, 255, 255,.2), var(--main-bg-color), rgba(255, 255, 255,.2));
@@ -715,16 +717,27 @@ h1,h2,h3,h4,h5,h6{
 /**
 * Return message styles
 */
+.alert{
+    position: absolute;
+    display: grid;
+    width: 97%;
+    top: 0;
+    z-index: 1000;
+    visibility: hidden;
+    margin: .95rem;
+    height: 50px;
+    justify-content: center;
+    align-content: center;
+    place-items: center;
+}
 #return-message{
     background: rgb(255, 255, 255);
     border-left: 6px solid var(--main-bg-color);
     color: #000;
-    margin: .85rem;
     padding: 1rem;
     position: absolute;
     right: 0;
     top: 0;
-    z-index: 1000;
     display: grid;
     font-weight: bolder;
     font-size: .95rem;
@@ -733,6 +746,7 @@ h1,h2,h3,h4,h5,h6{
     word-wrap: break-word;
     box-shadow: 0px 0px 10px silver;
     max-width: 400px;
+    border-radius: 5px;
     width: 400px;
     opacity: 0;
     visibility: hidden;
@@ -898,6 +912,10 @@ h1,h2,h3,h4,h5,h6{
     border: 1px solid var(--main-bg-color);
 }
 
+#signup-main{
+    text-align: left !important;
+}
+
 /**
 * Mobile Settings
 */
@@ -910,6 +928,15 @@ h1,h2,h3,h4,h5,h6{
     .content-section{
         height: 100%;
     }
+    .alert{
+        margin-top: 1rem;
+        width: 95%;;
+    }
+    #return-message{
+        max-width: 500px;
+        right: auto;
+    }
+    
 }
 
 @media screen and (max-width:600px) {
@@ -922,7 +949,7 @@ h1,h2,h3,h4,h5,h6{
         height: calc(100vh -  12rem);
     }
     .content-section__left-faq{
-        margin-top: -20px;
+        margin-top: -70px;
         margin-bottom: 100px;
     }
     .navbar__right{
@@ -1037,9 +1064,13 @@ h1,h2,h3,h4,h5,h6{
     .footer__left, .footer__right{
         text-align: center;
     }
-    #return-message{
-        width: 80%;
+    .alert{
         margin: auto;
-        margin: .95rem;
+        width: 100%;
+        margin-top: 1rem;
+    }
+    #return-message{
+        right: auto;
+        max-width: 450px;
     }
 }

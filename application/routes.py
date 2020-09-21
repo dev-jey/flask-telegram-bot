@@ -8,13 +8,13 @@ import random
 from os import environ
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime as dt
-from flask import Flask, render_template, request, redirect, url_for, flash, make_response,jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, make_response
 from flask import current_app as app
 from flask_login import login_required, logout_user, current_user, login_user
 from .factory import login_manager
 from .models import db, User, Message
 from .auth import sign_up
-from .messages import add_message, get_all_messages, edit_message, send_verification_code
+from .messages import add_message, get_all_messages, edit_message, send_mobile_code
 
 
 
@@ -186,7 +186,21 @@ def edit_a_message():
 @app.route("/send_code", methods=['POST'])
 @login_required
 def send_code():
-    return send_verification_code()
+    try:
+        data = request.get_json()
+        code = data["code"]
+        mobile_no = data["mobile"]
+        if not code:
+            return make_response(f"Enter a valid country code e.g 254", 400)
+        if not mobile_no:
+            return make_response(f"Enter a valid mobile no e.g 0712345678", 400)
+        resp = send_mobile_code.delay(mobile_no, code)
+        print(resp)
+        return make_response(f"We have sent a code to your phone.Check the telegram app or your messages", 200)
+        
+    except BaseException as e:
+        print("Error: ", e)
+        return make_response(f"We are experiencing a problem sending the code", 400)
 
 
 

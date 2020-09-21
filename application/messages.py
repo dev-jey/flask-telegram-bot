@@ -3,7 +3,7 @@ from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 import datetime as dt
-from flask import Flask, render_template, request, redirect, url_for, flash, make_response,jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, make_response
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from flask_login import login_required, current_user
@@ -16,15 +16,9 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 
 options = webdriver.ChromeOptions()
-options.add_argument("--window-size=1920,1080")
-options.add_argument('--disable-gpu')
-options.add_argument("disable-infobars")
-options.add_argument("--disable-extensions")
 options.add_argument("--no-sandbox")
 options.add_argument("--headless")
-options.add_argument("--disable-setuid-sandbox") 
-options.add_argument("--remote-debugging-port=9222")
-options.add_argument("--disable-dev-shm-usage")
+options.add_experimental_option("detach", True)
 if os.environ.get('FLASK_ENV') == 'production':
     options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
 app.permanent_session_lifetime = dt.timedelta(days=365)
@@ -127,22 +121,15 @@ def get_all_messages(user):
 
 
 
-def send_verification_code():
-    data = request.get_json()
-    code = data['code']
-    mobile_no = data['mobile']
-    if not code:
-        return make_response(f"Enter a valid country code e.g 254", 400)
-    if not mobile_no:
-        return make_response(f"Enter a valid mobile no e.g 0712345678", 400)
-    send_mobile_code.delay(mobile_no, code)
-    return make_response(f"You will receive a code in your mobile phone soon", 200)
-
-
 @celery.task(name="Send mobile verification code")
 def send_mobile_code(mobile_no, code):
     try:
-        wait, driver = start_browser()
+        global driver
+        if os.environ.get('FLASK_ENV') == 'production':
+            driver = webdriver.Chrome(executable_path=str(os.environ.get('CHROMEDRIVER_PATH')), options=options)
+        else:
+            driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+        wait = WebDriverWait(driver, 10000)
         driver.get('https://web.telegram.org/#/login')
         wait.until(
             lambda driver: driver.current_url == 'https://web.telegram.org/#/login')
@@ -159,15 +146,33 @@ def send_mobile_code(mobile_no, code):
         driver.find_element_by_xpath(
             "/html/body/div[1]/div/div[2]/div[2]/form/div[2]/div[2]/input"
         ).send_keys(Keys.ENTER)
+
         wait.until(
-            EC.visibility_of_element_located((By.CSS_SELECTOR, 'button[ng-click="$close(data)"]'))
+            EC.visibility_of_element_located((By.XPATH, "//span[@my-i18n='modal_ok']"))
         )
-        driver.find_element_by_css_selector('button[ng-click="$close(data)"]').click()
-        print(">>>>>>>>>>>>>>", "Sent")
+        driver.find_element_by_xpath("//span[@my-i18n='modal_ok']").click()
+        #Wrong mobile number error
+        try:
+            wrong_number = WebDriverWait(driver, 10).until(
+                EC.visibility_of_element_located((By.XPATH, "//label[@my-i18n='login_incorrect_number']"))
+            )
+            if wrong_number:
+                return {"resp":"Code can't be sent. You entered a wrong phone number format.","status": 400}
+        except BaseException as e:
+            print("1. Success, Mobile number correct")
+        try:
+            #Check for too many times error
+            too_many_times = driver.find_element_by_xpath("/html/body/div[5]/div[2]/div/div/div[2]/button").is_displayed()
+            if too_many_times:
+                return {"resp":"Code can't be sent. You are performing too many actions. Please try again later.", "status":400}
+        except BaseException as e:
+            print("2. Success, No too many times error")
+        print("3. ", "Success, Code has been Sent")
+        return {"resp":"Code has been sent", "status":200}
     
     except BaseException as e:
         print("Error: ", e)
-        return make_response(f"We are experiencing a problem sending the code", 400)
+        return {"resp":"We are experiencing a problem sending the code", "status":400}
 
     
 
@@ -221,12 +226,11 @@ def verify_code():
                 new_process.iterations = iterations
                 db.session.commit()  # Commits all changes
         else:
-            driver.quit()
+            driver.close()
         return make_response(f"Messaging Started")
     except BaseException as e:
         print("Error: ",e)
         driver.close()
-        driver.quit()
         return make_response(f"An error occured while starting process")
 
 
@@ -243,7 +247,6 @@ def stop_process():
         ).first()
         existing_process.on = False
         driver.close()
-        driver.quit()
         return make_response("Stopped")
     except BaseException as e:
         print(e)
