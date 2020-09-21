@@ -2,8 +2,9 @@
 
 //Login Button Click
 $("#login").click(function (e) {
-    closeMenu(e);
-    openLogin(e);
+    e.preventDefault();
+    closeMenu();
+    openLogin();
 });
 
 //$("#verify-submit").click(function(e){
@@ -13,132 +14,137 @@ $("#login").click(function (e) {
 
 
 $("#login-desktop").click(function (e) {
-    openLogin(e);
+    e.preventDefault();
+    openLogin();
 });
 
 // Mobile close
 $("#x-mobile").click(function (e) {
-    closeMobile(e);
+    e.preventDefault();
+    closeMobile();
 });
 
 // Verify Close
 $("#x-verify").click(function (e) {
-    closeVerifyPage(e);
+    e.preventDefault();
+    closeVerifyPage();
 });
 
 //Login close
 $("#x").click(function (e) {
-    closeLogin(e);
+    e.preventDefault();
+    closeLogin();
 });
 
 //signup close
 $("#x-signup").click(function (e) {
-    closeSignup(e);
+    e.preventDefault();
+    closeSignup();
 });
 
 //Signup Button Click
 $("#signup").click(function (e) {
-    closeMenu(e);
-    openSignup(e);
+    e.preventDefault();
+    closeMenu();
+    openSignup();
 });
 
 $("#signup-desktop").click(function (e) {
-    openSignup(e);
+    e.preventDefault();
+    openSignup();
 });
 
 $("#signup-main").click(function (e) {
-    openSignup(e);
+    e.preventDefault();
+    openSignup();
 });
 
 
 // Toggle Menu
 $("#ham").click(function (e) {
-    openMenu(e);
+    e.preventDefault();
+    openMenu();
 });
 
 $("#x-menu").click(function (e) {
-    closeMenu(e);
+    e.preventDefault();
+    closeMenu();
 });
 
 
 $("#mobile-cover").click(function (e) {
-    closeMenu(e);
+    e.preventDefault();
+    closeMenu();
 });
 
 //Open signup
 $("#signup-link").click(function (e) {
-    closeLogin(e);
-    openSignup(e);
+    e.preventDefault();
+    closeLogin();
+    openSignup();
 })
 
 $("#login-link").click(function (e) {
-    closeSignup(e);
-    openLogin(e);
+    e.preventDefault();
+    closeSignup();
+    openLogin();
 })
 
 $("#go-to-login").click(function (e) {
-    openLogin(e)
+    e.preventDefault();
+    openLogin()
 })
 
 // Functions
 function openMobileForm(e) {
-    e.preventDefault();
     $(".pid").html(e.target.id);
+    $(".pid2").html(e.target.id);
     $("#mobile-page").addClass("show");
     $("#x-mobile").css("display", "block");
 }
 
-function openVerifyPage(e) {
-    e.preventDefault();
+function openVerifyPage() {
     $("#verify-page").addClass("show");
     $("#x-verify").css("display", "block");
 }
 
-function openSignup(e) {
-    e.preventDefault();
+function openSignup() {
     $("#signup-page").addClass("show");
     $("#x-signup").css("display", "block");
 }
 
-function openLogin(e) {
-    e.preventDefault();
+function openLogin() {
     $("#login-page").addClass("show");
     $("#x").css("display", "block");
 }
 
-function openMenu(e) {
-    e.preventDefault();
+function openMenu() {
     $("#mobile-cover").addClass("show");
     $("#mobile-menu").addClass("show");
     $("#x-menu").css("display", "block");
 }
 
-function closeSignup(e) {
-    e.preventDefault();
+function closeSignup() {
     $("#signup-page").removeClass("show");
     $("#x-signup").css("display", "none");
 }
 
-function closeLogin(e) {
-    e.preventDefault();
+function closeLogin() {
     $("#login-page").removeClass("show");
     $("#x").css("display", "none");
 }
-function closeMenu(e) {
-    e.preventDefault();
+function closeMenu() {
     $("#mobile-cover").removeClass("show");
     $("#mobile-menu").removeClass("show");
     $("#x-menu").css("display", "none");
 }
 
-function closeMobile(e) {
-    e.preventDefault();
+function closeMobile() {
     $("#mobile-page").removeClass("show");
     $("#x-mobile").css("display", "none");
 }
 
-function closeVerifyPage(e) {
-    e.preventDefault();
+function closeVerifyPage() {
     $("#verify-page").removeClass("show");
     $("#x-verify").css("display", "none");
 }
@@ -179,7 +185,7 @@ function register() {
         global: true,
         data: JSON.stringify({ username: username, email: email, password: password, repassword: repassword }),
         success: function (data) {
-            displayAlert('success');
+            displayAlert('success',90000);
             $("#return-message").html(data);
         },
         error: function (error) {
@@ -202,9 +208,9 @@ function register() {
  * @param {*} state 
  * Alert display
  */
-function displayAlert(state) {
+function displayAlert(state,timeout=3000) {
     $("#return-message").css({ "opacity": 1, "width": "93%", "visibility": "visible", "display": "block" })
-        .delay(3000).fadeOut('slow');
+        .delay(timeout).fadeOut('slow');
     if (state == "error") {
         $("#return-message").css("border-left", "6px solid red");
     }
@@ -215,7 +221,6 @@ function displayAlert(state) {
         $("#return-message").css("border-left", "6px solid #039BE5");
     }
 }
-
 
 
 /**
@@ -310,14 +315,15 @@ function login() {
  * Logout functionality
  */
 $("#logout").click(function (e) {
-    logout(e);
+    e.preventDefault();
+    logout();
 })
 $("#logout-mobile").click(function (e) {
-    logout(e);
+    e.preventDefault();
+    logout();
 })
 
-function logout(e) {
-    e.preventDefault();
+function logout() {
     $.ajax({
         url: "/logout",
         type: "GET",
@@ -424,15 +430,16 @@ function editMessage(e){
  */
 // Start message
 $(".start-message").click(function (e) {
+    e.preventDefault();
     openMobileForm(e);
 })
 
 $("#mobile-form").submit(function (e) {
-    sendVerificationCode(e);
+    e.preventDefault();
+    sendVerificationCode();
 })
 
-function sendVerificationCode(e){
-    e.preventDefault();
+function sendVerificationCode(){
     var mobileNo = $("#mobile").val();
     var code = $("#code").val();
     if(!code){
@@ -466,10 +473,57 @@ function sendVerificationCode(e){
             $("#return-message").html(error.responseText);
         },
         beforeSend: function () {
+            displayAlert('info',1000000);
+            $("#return-message").html("We are sending a code to your phone (In the telegram app/messages). This may take a few minutes");
             $("#mobile-submit").prop({ "disabled": true, "value": "Loading" });
         },
         complete: function () {
             $("#mobile-submit").prop({ "disabled": false, "value": "Send Code" });
+        }
+    });
+}
+
+
+/**
+ * Verify form submit
+ */
+$("#verify-form").submit(function(e){
+    e.preventDefault();
+    verifyCode();
+});
+
+function verifyCode(){
+    var my_code = $("#verification").val();
+    var pid = $(".pid2").val();
+    if(!my_code){
+        displayAlert('error');
+        $("#return-message").html("Enter the code received on your mobile phone");
+        return;
+    }
+
+    $.ajax({
+        url: "/verify_code",
+        type: "POST",
+        contentType: "application/json",
+        crossDomain: true,
+        global: true,
+        data: JSON.stringify({ my_code: my_code, pid: pid}),
+        success: function (data) {
+            displayAlert('success');
+            $("#return-message").html(data);
+            setTimeout(function(){
+                closeVerifyPage();
+            }, 500);
+        },
+        error: function (error) {
+            displayAlert('error');
+            $("#return-message").html(error.responseText);
+        },
+        beforeSend: function () {
+            $("#verify-submit").prop({ "disabled": true, "value": "Loading" });
+        },
+        complete: function () {
+            $("#verify-submit").prop({ "disabled": false, "value": "Verify" });
         }
     });
 }

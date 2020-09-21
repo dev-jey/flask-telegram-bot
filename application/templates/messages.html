@@ -17,8 +17,8 @@
         <p>Enter your mobile number below. A verification code will be <br> sent to your mobile phone (Either in the telegram <br> mobile app or text messages)</p><br>
         <p class="pid" hidden></p>
         <input type="number" name="code" id="code" class="input-fields" placeholder="+254"
-            onkeydown="javascript: return event.keyCode == 69 ? false : true">
-        <input type="number" name="mobile" id="mobile" class="input-fields" placeholder="Mobile no"
+            onkeydown="javascript: return event.keyCode == 69 ? false : true"><br>
+        <input type="number" name="mobile" id="mobile" class="input-fields" placeholder="712345678"
             onkeydown="javascript: return event.keyCode == 69 ? false : true"><br>
         <input type="submit" name="mobile-submit" id="mobile-submit" class="btn submit-btn" value="Send Code"><br>
     </form>
@@ -34,12 +34,13 @@
             <div class="close-btn"></div>
         </div>
     </div>
-    <form class="mobile-form" method="POST">
+    <form class="mobile-form" id="verify-form" method="POST">
         <h1>Enter Verification Code</h1>
         <p>Check your mobile phone for a <br> verification code.</p><br>
-        <input required type="number" name="mobile" id="verification" class="input-fields" placeholder="Verification No"
+        <p class="pid2" hidden></p>
+        <input type="number" name="verification" id="verification" class="input-fields" placeholder="Verification No"
             onkeydown="javascript: return event.keyCode == 69 ? false : true"><br>
-        <input type="submit" name="mobile-submit" id="verify-submit" class="btn submit-btn" value="Verify"><br>
+        <input type="submit" name="verify-submit" id="verify-submit" class="btn submit-btn" value="Verify"><br>
     </form>
 </section>
 {% endblock %}
