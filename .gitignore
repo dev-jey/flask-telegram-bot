@@ -3,4 +3,4 @@ __pycache__
 .env
 logfile
 env/
-dump.rdp
+dump.rdb
