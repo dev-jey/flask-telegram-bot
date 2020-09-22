@@ -124,27 +124,32 @@ def activate_account(token):
 
 @app.route('/login', methods=['POST'])
 def login():
-    """Login via query string parameters."""
-    data = request.get_json()
-    user = data['email']
-    password = data['password']
-    # if current_user.is_authenticated:
-    #     return redirect(url_for('home'))
-    if not user or not password:
-        return make_response(f"Enter your username/email and password", 400)
-    existing_username = None
-    existing_email = None
-    existing_email = User.query.filter(
-        User.email == user).first()
-    existing_username = User.query.filter(
-        User.username == user).first()
-    if existing_username or existing_email:
-        user = existing_username or existing_email
-        user.authenticated = True
-        if check_password_hash(user.password, password):
-            login_user(user, remember=True)
-            return make_response(f'Login Successful', 200)
-    return make_response(f'Wrong credentials! Try again', 403)
+    try:
+        """Login via query string parameters."""
+        data = request.get_json()
+        user = data['email']
+        password = data['password']
+        # if current_user.is_authenticated:
+        #     return redirect(url_for('home'))
+        if not user or not password:
+            return make_response(f"Enter your username/email and password", 400)
+        existing_username = None
+        existing_email = None
+        existing_email = User.query.filter(
+            User.email == user).first()
+        existing_username = User.query.filter(
+            User.username == user).first()
+        if existing_username or existing_email:
+            user = existing_username or existing_email
+            user.authenticated = True
+            if check_password_hash(user.password, password):
+                login_user(user, remember=True)
+                return make_response(f'Login Successful', 200)
+        return make_response(f'Wrong credentials! Try again', 403)
+    except BaseException as e:
+        print("Error", e)
+        return make_response(f'We are experiencing some trouble logging you in. Please try again', 403)
+
 
 
 @app.route('/logout')

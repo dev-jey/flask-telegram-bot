@@ -35,7 +35,7 @@ def sign_up(username, email, password, confirm_password):
         return account_verification_email_send(username, email)
     except BaseException as e:
         print(e)
-        return make_response(f"A problem occurred during signup", 400)
+        return make_response(f"We are experiencing some trouble creating your account. Please try again", 400)
 
 
 '''Signup Validations'''
