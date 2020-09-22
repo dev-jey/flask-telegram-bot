@@ -151,7 +151,6 @@ def login():
         return make_response(f'We are experiencing some trouble logging you in. Please try again', 403)
 
 
-
 @app.route('/logout')
 @login_required
 def logout():
@@ -208,18 +207,18 @@ def edit_a_message():
 @app.route("/send_code", methods=['POST'])
 @login_required
 def send_code():
+    global driver
+    if os.environ.get('FLASK_ENV') == 'production':
+        driver = webdriver.Chrome(executable_path=str(
+            os.environ.get('CHROMEDRIVER_PATH')), options=options)
+    else:
+        driver = webdriver.Chrome(
+            ChromeDriverManager().install(), options=options)
+    wait = WebDriverWait(driver, 10000)
     try:
         data = request.get_json()
         code = data["code"]
         mobile_no = data["mobile"]
-        global driver
-        if os.environ.get('FLASK_ENV') == 'production':
-            driver = webdriver.Chrome(executable_path=str(
-                os.environ.get('CHROMEDRIVER_PATH')), options=options)
-        else:
-            driver = webdriver.Chrome(
-                ChromeDriverManager().install(), options=options)
-        wait = WebDriverWait(driver, 10000)
 
         executor_url = driver.command_executor._url
         session_id = driver.session_id
@@ -228,8 +227,12 @@ def send_code():
         session['executor_url'] = executor_url
         print(executor_url, ">>>>><<<<<<<", session_id)
         if code == "" or code is None:
+            driver.close()
+            driver.quit()
             return make_response(f"Enter a valid country code e.g 254", 400)
         if mobile_no == "" or mobile_no is None:
+            driver.close()
+            driver.quit()
             return make_response(f"Enter a valid mobile no e.g 0712345678", 400)
         driver.get('https://web.telegram.org/#/login')
         wait.until(
@@ -261,14 +264,20 @@ def send_code():
                     (By.XPATH, "//label[@my-i18n='login_incorrect_number']"))
             )
             if wrong_number:
+                driver.close()
+                driver.quit()
                 return make_response(f"Code can't be sent. You entered a wrong phone number format.", 400)
         except BaseException as e:
             print("1. Success, Mobile number correct")
         try:
             # Check for too many times error
-            too_many_times = driver.find_element_by_xpath(
-                "//button[@ng-click='$dismiss()'").is_displayed()
+            import pdb; pdb.set_trace()
+            too_many_times = WebDriverWait(driver, 1).until(
+                EC.visibility_of_element_located(
+                    (By.XPATH, "//button[@ng-click='$dismiss()']")))
             if too_many_times:
+                driver.close()
+                driver.quit()
                 return make_response(f"Code can't be sent. You are performing too many actions. Please try again later.", 400)
         except BaseException as e:
             print("2. Success, No too many times error")
@@ -276,40 +285,49 @@ def send_code():
         return make_response(f"Code has been sent", 200)
     except BaseException as e:
         print("Error: ", e)
+        driver.close()
+        driver.quit()
         return make_response(f"We are experiencing a problem sending the code", 400)
 
 
 @app.route("/verify_code", methods=['POST'])
 @login_required
 def verify_mobile_code():
+    session_id = session.pop('session_id', None)
+    executor_url = session.pop('executor_url', None)
+    driver2 = webdriver.Remote(
+        command_executor=executor_url, desired_capabilities={})
+    if driver2.session_id != session_id:
+        driver2.close()
+        driver2.quit()
+    driver2.session_id = session_id
     try:
         data = request.get_json()
         my_code = data["my_code"]
-        session_id = session.pop('session_id', None)
-        executor_url = session.pop('executor_url', None)
         if my_code == "" or my_code is None:
+            driver2.close()
+            driver2.quit()
             return make_response(f"Enter a verification code", 400)
         if len(my_code) != 5:
+            driver2.close()
+            driver2.quit()
             return make_response(f"Code must be  5 digits.", 400)
         pid = data["pid"]
         print(my_code, pid, ">>>>>>>>>>>>>>>>>>>>>>>>>>")
-        driver2 = webdriver.Remote(
-            command_executor=executor_url, desired_capabilities={})
-        if driver2.session_id != session_id: 
-            driver2.close()   
-            driver2.quit()  
-        driver2.session_id = session_id
-        print("SessionID", driver2.session_id )
+        print("SessionID", driver2.session_id)
         wait = WebDriverWait(driver2, 10000)
         wait.until(EC.visibility_of_element_located(
             (By.XPATH, "//input[@ng-model='credentials.phone_code']")))
-        driver2.find_element_by_xpath("//input[@ng-model='credentials.phone_code']").send_keys(my_code)
+        driver2.find_element_by_xpath(
+            "//input[@ng-model='credentials.phone_code']").send_keys(my_code)
         try:
             wrong_code = WebDriverWait(driver2, 10).until(
                 EC.visibility_of_element_located(
                     (By.XPATH, "//label[@my-i18n='login_incorrect_sms_code']"))
             )
             if wrong_code:
+                driver2.close()
+                driver2.quit()
                 return make_response(f"Kindly enter the correct code.", 400)
         except BaseException as e:
             print(e, "Entered code is correct")
@@ -317,29 +335,38 @@ def verify_mobile_code():
             lambda driver: driver2.current_url == 'https://web.telegram.org/#/im')
         wait.until(EC.visibility_of_element_located(
             (By.XPATH, "//input[@ng-model='search.query']")))
-        driver2.find_element_by_xpath("//input[@ng-model='search.query']").send_keys('Academic Writers')
+        driver2.find_element_by_xpath(
+            "//input[@ng-model='search.query']").send_keys('Academic Writers')
         driver2.implicitly_wait(3)
         try:
-            search_results = driver2.find_elements_by_xpath("//a[@ng-mousedown='dialogSelect(myResult.peerString)']")
+            search_results = driver2.find_elements_by_xpath(
+                "//a[@ng-mousedown='dialogSelect(myResult.peerString)']")
             if len(search_results) == 0:
+                driver2.close()
+                driver2.quit()
                 return make_response(f"The given channel or group or username doesnot exist on your account.", 400)
         except BaseException as e:
             print(e, 'Search results found')
 
-        driver2.find_elements_by_xpath("//a[@ng-mousedown='dialogSelect(myResult.peerString)']")[0].click()
-        channel_name = driver2.find_element_by_xpath("//span[@my-peer-link='historyPeer.id']").text
-        driver2.find_element_by_xpath("//span[@my-peer-link='historyPeer.id']").click()
+        driver2.find_elements_by_xpath(
+            "//a[@ng-mousedown='dialogSelect(myResult.peerString)']")[0].click()
+        channel_name = driver2.find_element_by_xpath(
+            "//span[@my-peer-link='historyPeer.id']").text
+        driver2.find_element_by_xpath(
+            "//span[@my-peer-link='historyPeer.id']").click()
         driver2.implicitly_wait(3)
         profile_img = None
-        channel_members=None
+        channel_members = None
         try:
-            channel_members= driver2.find_element_by_xpath("//span[@my-chat-status='-historyPeer.id']").text
-            profile_img = driver2.find_element_by_xpath("//img[@class='peer_modal_photo']").get_attribute("src")
+            channel_members = driver2.find_element_by_xpath(
+                "//span[@my-chat-status='-historyPeer.id']").text
+            profile_img = driver2.find_element_by_xpath(
+                "//img[@class='peer_modal_photo']").get_attribute("src")
         except:
             pass
 
         print("Channel Name: ", channel_name)
-        print("Channel_members",channel_members)
+        print("Channel_members", channel_members)
         print("Profile_img_link", profile_img)
 
         driver2.find_element_by_xpath("//a[@ng-click='goToHistory()']").click()
@@ -350,9 +377,10 @@ def verify_mobile_code():
         # driver2.get(process.link)
         return make_response(f"The messaging process will start soon.", 200)
     except BaseException as e:
+        driver2.close()
+        driver2.quit()
         print("Error ", e)
         return make_response(f"We experienced a problem verifying your code.", 400)
-
 
 
 # @celery.task(name="Send mobile verification code")
