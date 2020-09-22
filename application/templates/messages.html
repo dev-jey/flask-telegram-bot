@@ -92,7 +92,7 @@
                     <p class="off"></p>
                     {% endif %}
                     <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="">
-                    <span class="message-name">{{message.name|truncate(30)}}</span>
+                    <span class="message-name">{{message.name|truncate(20)}}</span>
                     <p class="messages-sofar">{{message.iterations}} Message(s) sent so far</p>
                 </div>
                 <div class="flip-card-back">
@@ -101,8 +101,8 @@
                     <input type="button" class="start-message" id="{{message.id}}" value="Start Sending">
 
                     <div class="flip-card-back__content">
-                        <h4>{{message.name|truncate(30)}}</h4>
-                        <p>{{message.message|truncate(250)}}
+                        <h4>{{message.name|truncate(20)}}</h4>
+                        <p>{{message.message}}
                         </p>
                         <label>Repeats: Every {{message.duration}} Minute(s)</label>
                     </div>
