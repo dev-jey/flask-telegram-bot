@@ -48,7 +48,7 @@ logger = logging.getLogger(__name__)
 # logger.setLevel(logging.INFO)
 
 # logging.basicConfig()
-logging.basicConfig(level=logging.INFO, format="{levelname}::{asctime:<12} '{message}' ({filename}:{lineno})", style="{")
+logging.basicConfig(level=logging.INFO, format="\n\n{asctime:<12} '\n----------------------\n{levelname}: {message}\n----------------------\n' ({filename}:{lineno})\n\n", style="{")
 
 
 
@@ -239,7 +239,7 @@ def send_code():
 
         session['session_id'] = session_id
         session['executor_url'] = executor_url
-        logger.info(f"{executor_url} >>>>><<<<<<< {session_id}")
+        logger.info(f"EXECUTOR_URL: {executor_url}, SESSION_ID:{session_id}")
         if code == "" or code is None:
             close_driver(driver)
             return make_response(f"Enter a valid country code e.g 254", 400)
@@ -283,7 +283,6 @@ def send_code():
             logger.info("1. Success, Mobile number correct")
         try:
             # Check for too many times error
-            # import pdb; pdb.set_trace()
             too_many_times = WebDriverWait(driver, 1).until(
                 EC.visibility_of_element_located(
                     (By.XPATH, "//button[@ng-click='$dismiss()']")))
@@ -292,7 +291,6 @@ def send_code():
                 return make_response(f"Code can't be sent. You are performing too many actions. Please try again later.", 400)
         except BaseException as e:
             logger.info("2. Success, No too many times error")
-        logger.info("3. ", "Success, Code has been Sent")
         return make_response(f"Code has been sent", 200)
     except BaseException as e:
         error_logger(e)
@@ -320,7 +318,7 @@ def verify_mobile_code():
             close_driver(driver2)
             return make_response(f"Code must be  5 digits.", 400)
         pid = data["pid"]
-        logger.info(f"My_code: {my_code} PID: {pid} >>>>>>>>>>>>>>>>>>>>>>>>>>")
+        logger.info(f"My_code: {my_code} PID: {pid}")
         logger.info(f"SessionID {driver2.session_id}")
         wait = WebDriverWait(driver2, 10000)
         wait.until(EC.visibility_of_element_located(
