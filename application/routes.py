@@ -241,12 +241,10 @@ def send_code():
         session['executor_url'] = executor_url
         logger.info(f"{executor_url} >>>>><<<<<<< {session_id}")
         if code == "" or code is None:
-            driver.close()
-            driver.quit()
+            close_driver(driver)
             return make_response(f"Enter a valid country code e.g 254", 400)
         if mobile_no == "" or mobile_no is None:
-            driver.close()
-            driver.quit()
+            close_driver(driver)
             return make_response(f"Enter a valid mobile no e.g 0712345678", 400)
         driver.get('https://web.telegram.org/#/login')
         wait.until(
@@ -279,8 +277,7 @@ def send_code():
                     (By.XPATH, "//label[@my-i18n='login_incorrect_number']"))
             )
             if wrong_number:
-                driver.close()
-                driver.quit()
+                close_driver(driver)
                 return make_response(f"Code can't be sent. You entered a wrong phone number format.", 400)
         except BaseException as e:
             logger.info("1. Success, Mobile number correct")
@@ -291,8 +288,7 @@ def send_code():
                 EC.visibility_of_element_located(
                     (By.XPATH, "//button[@ng-click='$dismiss()']")))
             if too_many_times:
-                driver.close()
-                driver.quit()
+                close_driver(driver)
                 return make_response(f"Code can't be sent. You are performing too many actions. Please try again later.", 400)
         except BaseException as e:
             logger.info("2. Success, No too many times error")
@@ -300,8 +296,7 @@ def send_code():
         return make_response(f"Code has been sent", 200)
     except BaseException as e:
         error_logger(e)
-        driver.close()
-        driver.quit()
+        close_driver(driver)
         return make_response(f"We are experiencing a problem sending the code", 400)
 
 
@@ -313,19 +308,16 @@ def verify_mobile_code():
     driver2 = webdriver.Remote(
         command_executor=executor_url, desired_capabilities={})
     if driver2.session_id != session_id:
-        driver2.close()
-        driver2.quit()
+        close_driver(driver2)
     driver2.session_id = session_id
     try:
         data = request.get_json()
         my_code = data["my_code"]
         if my_code == "" or my_code is None:
-            driver2.close()
-            driver2.quit()
+            close_driver(driver2)
             return make_response(f"Enter a verification code", 400)
         if len(my_code) != 5:
-            driver2.close()
-            driver2.quit()
+            close_driver(driver2)
             return make_response(f"Code must be  5 digits.", 400)
         pid = data["pid"]
         logger.info(f"My_code: {my_code} PID: {pid} >>>>>>>>>>>>>>>>>>>>>>>>>>")
@@ -341,8 +333,7 @@ def verify_mobile_code():
                     (By.XPATH, "//label[@my-i18n='login_incorrect_sms_code']"))
             )
             if wrong_code:
-                driver2.close()
-                driver2.quit()
+                close_driver(driver2)
                 return make_response(f"Kindly enter the correct code.", 400)
         except BaseException as e:
             logger.info("Entered code is correct")
@@ -357,8 +348,7 @@ def verify_mobile_code():
             search_results = driver2.find_elements_by_xpath(
                 "//a[@ng-mousedown='dialogSelect(myResult.peerString)']")
             if len(search_results) == 0:
-                driver2.close()
-                driver2.quit()
+                close_driver(driver2)
                 return make_response(f"The given channel or group or username doesnot exist on your account.", 400)
         except BaseException as e:
             logger.info('Search results found')
@@ -392,10 +382,17 @@ def verify_mobile_code():
         # driver2.get(process.link)
         return make_response(f"The messaging process will start soon.", 200)
     except BaseException as e:
-        driver2.close()
-        driver2.quit()
+        close_driver(driver2)
         error_logger(e)
         return make_response(f"We experienced a problem verifying your code.", 400)
+
+
+'''
+Close and Quit the current driver
+'''
+def close_driver(driver):
+    driver.close()
+    driver.quit()
 
 
 # @celery.task(name="Send mobile verification code")
@@ -493,7 +490,7 @@ def stop_process():
             Message.id == int(pid)
         ).first()
         existing_process.on = False
-        driver.close()
+        close_driver(driver)
         return make_response("Stopped")
     except BaseException as e:
         error_logger(e)
