@@ -349,7 +349,7 @@ def verify_mobile_code():
                 "//a[@ng-mousedown='dialogSelect(myResult.peerString)']")
             if len(search_results) == 0:
                 close_driver(driver2)
-                return make_response("The channel, group, or user name was not found", 404)
+                return make_response("The channel or group name was not found", 404)
         except BaseException as e:
             logger.info('Search results found')
 

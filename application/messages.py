@@ -54,7 +54,7 @@ def validateAddForm(name, duration, message):
     invalid = False
     if name == ""  or name is None:
         invalid = True
-        return make_response(f"Enter a channel or group or user name", 400)
+        return make_response(f"Enter a channel or group name", 400)
     if duration == ""  or duration is None:
         invalid = True
         return make_response(f"Enter a duration", 400)
