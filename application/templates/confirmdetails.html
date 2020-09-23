@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Confirm{% endblock %}
+
+{% block mobilemenu %}
+<a class="profile-name">Savalijey</a>
+<a href="/new" class="btn navbar__right-login" id="new-message">New message</a>
+<a href="/home" class="btn navbar__right-login" id="my-messages">My messages</a>
+<a href="/" class="btn navbar__right-signup" id="logout-mobile">Logout</a>
+{% endblock %}
+{%   block navright %}
+<a href="/home" class="btn navbar__right-login my-messages-desktop" id="my-messages-desktop">Messages</a>
+<div class="dropdown">
+    <img src="{{ url_for('static', filename='images/person_outline.svg') }}" class="logout-icon" alt="">
+    <div class="dropdown-content">
+        <a href="/" id="logout">Logout</a>
+    </div>
+</div>
+{%  endblock %}
+
+
+{% block content%}
+
+
+<div class="verified-msg">
+    {% if channel_name %}
+    <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="" class="verified-logo">
+    <h3>{{channel_name}}</h3>
+    <p>{{channel_members}}</p>
+    <!-- <br> -->
+    <a href="/" class="back-to-main-site">Confirm</a>
+    {% else %}
+
+    <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="" class="verified-logo">
+    <h4>Channel or group or user name not found</h4>
+    Ensure that you give a channel or group <br> that
+    you are a member of.
+    <a href="/home" class="back-to-main-site">View All Messages</a>
+    {% endif %}
+</div>
+
+
+{% endblock %}

@@ -913,7 +913,9 @@ a {
 #signup-main{
     text-align: left !important;
 }
-
+.edit-link{
+    text-decoration: underline;color: var(--main-bg-color);
+}
 /**
 * Mobile Settings
 */

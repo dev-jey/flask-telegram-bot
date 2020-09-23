@@ -185,7 +185,7 @@ function register() {
         global: true,
         data: JSON.stringify({ username: username, email: email, password: password, repassword: repassword }),
         success: function (data) {
-            displayAlert('success',90000);
+            displayAlert('success', 90000);
             $("#return-message").html(data);
         },
         error: function (error) {
@@ -208,7 +208,7 @@ function register() {
  * @param {*} state 
  * Alert display
  */
-function displayAlert(state,timeout=3000) {
+function displayAlert(state, timeout = 3000) {
     $("#return-message").css({ "opacity": 1, "width": "93%", "visibility": "visible", "display": "block" })
         .delay(timeout).fadeOut('slow');
     if (state == "error") {
@@ -292,7 +292,7 @@ function login() {
         success: function (data) {
             displayAlert('success');
             $("#return-message").html(data);
-            setTimeout(function(){
+            setTimeout(function () {
                 window.location.replace("/home");
             }, 500);
         },
@@ -357,7 +357,7 @@ function saveMessage() {
         success: function (data) {
             displayAlert('success');
             $("#return-message").html(data);
-            setTimeout(function(){
+            setTimeout(function () {
                 window.location.replace("/home");
             }, 500);
         },
@@ -388,13 +388,13 @@ $(".editselect").click(function (e) {
 /**
  * Edit form submission
  */
-$("#edit-form").submit(function  (e){
+$("#edit-form").submit(function (e) {
     e.preventDefault();
     editMessage(e);
 })
 
-function editMessage(e){
-    var id =$("#idStore").attr("value");
+function editMessage(e) {
+    var id = $("#idStore").attr("value");
     var message = $("#message-edit").val();
     var duration = $("#duration-edit").val();
     var name = $("#group-name-edit").val();
@@ -404,11 +404,11 @@ function editMessage(e){
         contentType: "application/json",
         crossDomain: true,
         global: true,
-        data: JSON.stringify({ message: message, duration: duration, name: name, id:id }),
+        data: JSON.stringify({ message: message, duration: duration, name: name, id: id }),
         success: function (data) {
             displayAlert('success');
             $("#return-message").html(data);
-            setTimeout(function(){
+            setTimeout(function () {
                 window.location.replace("/home");
             }, 500);
         },
@@ -439,31 +439,31 @@ $("#mobile-form").submit(function (e) {
     sendVerificationCode();
 })
 
-function sendVerificationCode(){
+function sendVerificationCode() {
     var mobileNo = $("#mobile").val();
     var code = $("#code").val();
-    if(!code){
+    if (!code) {
         displayAlert('error');
         $("#return-message").html("Enter a valid country number");
         return;
     }
-    if(!mobileNo){
+    if (!mobileNo) {
         displayAlert('error');
         $("#return-message").html("Enter a mobile number");
         return;
     }
-   
+
     $.ajax({
         url: "/send_code",
         type: "POST",
         contentType: "application/json",
         crossDomain: true,
         global: true,
-        data: JSON.stringify({ code: code, mobile: mobileNo}),
+        data: JSON.stringify({ code: code, mobile: mobileNo }),
         success: function (data) {
             displayAlert('success');
             $("#return-message").html(data);
-            setTimeout(function(){
+            setTimeout(function () {
                 closeMobile();
                 openVerifyPage();
             }, 500);
@@ -473,7 +473,7 @@ function sendVerificationCode(){
             $("#return-message").html(error.responseText);
         },
         beforeSend: function () {
-            displayAlert('info',1000000);
+            displayAlert('info', 1000000);
             $("#return-message").html("We are sending a code to your phone (In the telegram app/messages). This may take a few minutes");
             $("#mobile-submit").prop({ "disabled": true, "value": "Loading" });
         },
@@ -487,15 +487,15 @@ function sendVerificationCode(){
 /**
  * Verify form submit
  */
-$("#verify-form").submit(function(e){
+$("#verify-form").submit(function (e) {
     e.preventDefault();
     verifyCode();
 });
 
-function verifyCode(){
+function verifyCode() {
     var my_code = $("#verification").val();
-    var pid = $(".pid2").val();
-    if(!my_code){
+    var pid = $(".pid2").text();
+    if (!my_code) {
         displayAlert('error');
         $("#return-message").html("Enter the code received on your mobile phone");
         return;
@@ -507,16 +507,22 @@ function verifyCode(){
         contentType: "application/json",
         crossDomain: true,
         global: true,
-        data: JSON.stringify({ my_code: my_code, pid: pid}),
+        data: JSON.stringify({ my_code: my_code, pid: pid }),
         success: function (data) {
-            displayAlert('success');
-            $("#return-message").html(data);
-            setTimeout(function(){
+            const { pid, channel_name, channel_members } = data;
+            window.location.replace(`/confirm_details?pid=${pid}&channel_name=${channel_name}&channel_members=${channel_members}`);
+            $("#return-message").html(data.message);
+            setTimeout(function () {
                 closeVerifyPage();
             }, 500);
         },
         error: function (error) {
             displayAlert('error');
+            if (error.status == 404) {
+                $("#return-message").html(error.responseText);
+                window.location.replace(`/confirm_details`);
+                return;
+            }
             $("#return-message").html(error.responseText);
         },
         beforeSend: function () {

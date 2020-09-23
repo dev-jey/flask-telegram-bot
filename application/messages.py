@@ -82,3 +82,9 @@ def get_all_messages(user):
     except BaseException as e:
         print(e)
         return []
+
+
+'''
+Helper functions
+''' 
+ 

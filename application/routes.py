@@ -5,11 +5,11 @@ import json
 import os
 import jwt
 import random
-import   logging
+import logging
 from os import environ
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime as dt
-from flask import Flask, render_template, request, redirect, url_for, flash, make_response, session
+from flask import Flask, render_template, request, redirect, url_for, flash, make_response, session, jsonify
 from flask import current_app as app
 from flask_login import login_required, logout_user, current_user, login_user
 from .factory import login_manager
@@ -39,17 +39,14 @@ if os.environ.get('FLASK_ENV') == 'production':
 app.permanent_session_lifetime = datetime.timedelta(days=365)
 
 
-
-
-
-logger = logging.getLogger(__name__)  
+logger = logging.getLogger(__name__)
 
 # set log level
 # logger.setLevel(logging.INFO)
 
 # logging.basicConfig()
-logging.basicConfig(level=logging.INFO, format="\n\n{asctime:<12} '\n----------------------\n{levelname}: {message}\n----------------------\n' ({filename}:{lineno})\n\n", style="{")
-
+logging.basicConfig(level=logging.INFO,
+                    format="\n\n{asctime:<12} '\n----------------------\n{levelname}: {message}\n----------------------\n' ({filename}:{lineno})\n\n", style="{")
 
 
 '''
@@ -291,7 +288,9 @@ def send_code():
                 return make_response(f"Code can't be sent. You are performing too many actions. Please try again later.", 400)
         except BaseException as e:
             logger.info("2. Success, No too many times error")
-        return make_response(f"Code has been sent", 200)
+        if not driver.find_element_by_xpath("//input[@ng-model='credentials.phone_code']").is_displayed():
+            return make_response(f"We are experiencing a problem sending the code", 400)
+        return make_response(f"Code has been sent. Check your messages or telegram app", 200)
     except BaseException as e:
         error_logger(e)
         close_driver(driver)
@@ -339,15 +338,18 @@ def verify_mobile_code():
             lambda driver: driver2.current_url == 'https://web.telegram.org/#/im')
         wait.until(EC.visibility_of_element_located(
             (By.XPATH, "//input[@ng-model='search.query']")))
+        saved_message = Message.query.filter(
+            Message.id == int(pid)
+        ).first()
         driver2.find_element_by_xpath(
-            "//input[@ng-model='search.query']").send_keys('Academic Writers')
+            "//input[@ng-model='search.query']").send_keys(saved_message.name)
         driver2.implicitly_wait(3)
         try:
             search_results = driver2.find_elements_by_xpath(
                 "//a[@ng-mousedown='dialogSelect(myResult.peerString)']")
             if len(search_results) == 0:
                 close_driver(driver2)
-                return make_response(f"The given channel or group or username doesnot exist on your account.", 400)
+                return make_response("The channel, group, or user name was not found", 404)
         except BaseException as e:
             logger.info('Search results found')
 
@@ -358,36 +360,53 @@ def verify_mobile_code():
         driver2.find_element_by_xpath(
             "//span[@my-peer-link='historyPeer.id']").click()
         driver2.implicitly_wait(3)
-        profile_img = None
         channel_members = None
         try:
             channel_members = driver2.find_element_by_xpath(
                 "//span[@my-chat-status='-historyPeer.id']").text
-            profile_img = driver2.find_element_by_xpath(
-                "//img[@class='peer_modal_photo']").get_attribute("src")
         except:
             pass
 
         logger.info(f"Channel Name: {channel_name}")
         logger.info(f"Channel_members: {channel_members}")
-        logger.info(f"Profile_img_link: {profile_img}")
 
         driver2.find_element_by_xpath("//a[@ng-click='goToHistory()']").click()
+        return make_response(jsonify({
+            "message": "Confirm channel details to proceed",
+            "pid": pid,
+            "channel_name": channel_name,
+            "channel_members": channel_members
+        }), 200)
 
-        # process = Message.query.filter(
-        #     Message.id == int(pid)
-        # ).first()
-        # driver2.get(process.link)
-        return make_response(f"The messaging process will start soon.", 200)
     except BaseException as e:
         close_driver(driver2)
         error_logger(e)
-        return make_response(f"We experienced a problem verifying your code.", 400)
+        return make_response("We experienced a problem verifying your code.", 400)
+
+
+'''
+Channel/Group/Name Details
+'''
+
+
+@app.route("/confirm_details", methods=['GET'])
+@login_required
+def confirm_channel_details():
+    pid = request.args.get("pid", None)
+    channel_name = request.args.get("channel_name", None)
+    channel_members = request.args.get("channel_members", None)
+    profile_img = request.args.get("profile_img", None)
+    return render_template("confirmdetails.html",
+                           pid=pid, channel_name=channel_name,
+                           channel_members=channel_members, profile_img=profile_img
+                           )
 
 
 '''
 Close and Quit the current driver
 '''
+
+
 def close_driver(driver):
     driver.close()
     driver.quit()
@@ -519,9 +538,10 @@ def internal_server_error(e):
     return render_template('500.html'), 500
 
 
-
 '''
 Error logger helper
 '''
+
+
 def error_logger(e):
     return logger.error(f'An error occurred: {e}')
