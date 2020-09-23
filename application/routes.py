@@ -15,6 +15,7 @@ from flask_login import login_required, logout_user, current_user, login_user
 from .factory import login_manager
 from .models import db, User, Message
 from .auth import sign_up
+from .tasks import send_automated_messages
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
@@ -24,8 +25,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from flask_login import login_required, current_user
 from selenium.webdriver.support import expected_conditions as EC
 from flask import current_app as app
-from .models import db, User, Message
-from application import celery
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 
@@ -423,38 +422,16 @@ Start process
 @app.route("/start_process", methods=['POST'])
 @login_required
 def start_process():
-    data = request.get_json()
-    pid = data['pid']
-    process = Message.query.filter(
-        Message.id == int(pid) and Message.owner == current_user.id
-    ).first()
+    try:
+        data = request.get_json()
+        pid = data['pid']
+        send_automated_messages.delay(pid)
+        return make_response(f"Success. The process automation will start soon", 200)
+    except BaseException as e:
+        print(e)
+        return make_response(f"We are having trouble starting the process. Please try again later", 200)
 
-    session_id = process.session_id
-    executor_url = process.executor_url
-    logger.info(f"SESSION ID: {session_id} EXECUTOR_URL: {executor_url}")
-    if not session_id or not executor_url:
-        return make_response(f"You are currently not authenticated on telegram", 400)
-    driver3 = webdriver.Remote(
-        command_executor=executor_url, desired_capabilities={})
-    if driver3.session_id != session_id:
-        close_driver(driver3)
-    driver3.session_id = session_id
-    new_process = Message.query.filter(
-        Message.id == int(pid)
-    ).first()
-    iterations = 0
-    while True:
-        time.sleep(random.randint(-1, 1) + int(new_process.duration)
-                   * int(environ.get('TIME_MEASURE_SECONDS')))
-        driver3.find_element_by_xpath(
-            "/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div[3]/div[2]/div/div/div/form/div[2]/div[5]").send_keys(new_process.message)
-        driver3.find_element_by_xpath(
-            "/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div[3]/div[2]/div/div/div/form/div[2]/div[5]").send_keys(Keys.ENTER)
-        iterations += 1
-        new_process.created = dt.now()
-        new_process.iterations = iterations
-        new_process.on = True
-        db.session.commit()  # Commits all changes
+
 
 
 '''

@@ -2,7 +2,6 @@ import datetime as dt
 from flask import Flask, render_template, request, redirect, url_for, flash, make_response
 from flask import current_app as app
 from .models import db, User, Message
-from application import celery
 from flask_login import current_user
 
 
