@@ -226,16 +226,19 @@ def send_code():
         driver = webdriver.Chrome(
             ChromeDriverManager().install(), options=options)
     wait = WebDriverWait(driver, 10000)
+    executor_url = driver.command_executor._url
+    session_id = driver.session_id
     try:
         data = request.get_json()
+        pid = data["pid"]
         code = data["code"]
         mobile_no = data["mobile"]
-
-        executor_url = driver.command_executor._url
-        session_id = driver.session_id
-
-        session['session_id'] = session_id
-        session['executor_url'] = executor_url
+        process = Message.query.filter(
+            Message.id == int(pid)
+        ).first()
+        process.session_id = session_id
+        process.executor_url = executor_url
+        db.session.commit()
         logger.info(f"EXECUTOR_URL: {executor_url}, SESSION_ID:{session_id}")
         if code == "" or code is None:
             close_driver(driver)
@@ -300,26 +303,25 @@ def send_code():
 @app.route("/verify_code", methods=['POST'])
 @login_required
 def verify_mobile_code():
-    session_id = session.pop('session_id', None)
-    executor_url = session.pop('executor_url', None)
+    data = request.get_json()
+    my_code = data["my_code"]
+    pid = data["pid"]
+    if my_code == "" or my_code is None:
+        return make_response(f"Enter a verification code", 400)
+    if len(my_code) != 5:
+        return make_response(f"Code must be  5 digits.", 400)
+    logger.info(f"My_code: {my_code} PID: {pid}")
+    process = Message.query.filter(
+        Message.id == int(pid)
+    ).first()
     driver2 = webdriver.Remote(
-        command_executor=executor_url, desired_capabilities={})
-    if driver2.session_id != session_id:
+        command_executor=process.executor_url, desired_capabilities={})
+    if driver2.session_id != process.session_id:
         close_driver(driver2)
-    driver2.session_id = session_id
+    driver2.session_id = process.session_id
+    logger.info(f"SessionID {driver2.session_id}")
+    wait = WebDriverWait(driver2, 10000)
     try:
-        data = request.get_json()
-        my_code = data["my_code"]
-        if my_code == "" or my_code is None:
-            close_driver(driver2)
-            return make_response(f"Enter a verification code", 400)
-        if len(my_code) != 5:
-            close_driver(driver2)
-            return make_response(f"Code must be  5 digits.", 400)
-        pid = data["pid"]
-        logger.info(f"My_code: {my_code} PID: {pid}")
-        logger.info(f"SessionID {driver2.session_id}")
-        wait = WebDriverWait(driver2, 10000)
         wait.until(EC.visibility_of_element_located(
             (By.XPATH, "//input[@ng-model='credentials.phone_code']")))
         driver2.find_element_by_xpath(
@@ -347,19 +349,22 @@ def verify_mobile_code():
         try:
             search_results = driver2.find_elements_by_xpath(
                 "//a[@ng-mousedown='dialogSelect(myResult.peerString)']")
-            if len(search_results) == 0:
+            search_results_alternate = driver2.find_elements_by_xpath(
+                "//a[@ng-mousedown='dialogSelect(dialogMessage.peerString, dialogMessage.unreadCount == -1 && dialogMessage.mid)']"
+            )
+            if len(search_results) == 0 and len(search_results_alternate) == 0:
                 close_driver(driver2)
                 return make_response("The channel or group name was not found", 404)
         except BaseException as e:
             logger.info('Search results found')
-
-        driver2.find_elements_by_xpath(
-            "//a[@ng-mousedown='dialogSelect(myResult.peerString)']")[0].click()
+        if search_results:
+            driver2.find_elements_by_xpath(
+                "//a[@ng-mousedown='dialogSelect(myResult.peerString)']")[0].click()
+        if search_results_alternate:
+            driver2.find_elements_by_xpath(
+                "//a[@ng-mousedown='dialogSelect(dialogMessage.peerString, dialogMessage.unreadCount == -1 && dialogMessage.mid)']")[0].click()
         channel_name = driver2.find_element_by_xpath(
             "//span[@my-peer-link='historyPeer.id']").text
-        driver2.find_element_by_xpath(
-            "//span[@my-peer-link='historyPeer.id']").click()
-        driver2.implicitly_wait(3)
         channel_members = None
         try:
             channel_members = driver2.find_element_by_xpath(
@@ -369,8 +374,6 @@ def verify_mobile_code():
 
         logger.info(f"Channel Name: {channel_name}")
         logger.info(f"Channel_members: {channel_members}")
-
-        driver2.find_element_by_xpath("//a[@ng-click='goToHistory()']").click()
         return make_response(jsonify({
             "message": "Confirm channel details to proceed",
             "pid": pid,
@@ -412,105 +415,75 @@ def close_driver(driver):
     driver.quit()
 
 
-# @celery.task(name="Send mobile verification code")
-# def send_mobile_code(mobile_no, code):
-#     try:
-#         driver.get('https://web.telegram.org/#/login')
-#         wait.until(
-#             lambda driver: driver.current_url == 'https://web.telegram.org/#/login')
-#         wait.until(
-#             EC.element_to_be_clickable((By.XPATH, "/html/body/div[1]/div/div[2]/div[2]/form/div[2]/div[1]/input")))
-#         #Codefield
-#         driver.find_element_by_xpath(
-#             "/html/body/div[1]/div/div[2]/div[2]/form/div[2]/div[1]/input"
-#         ).send_keys(code)
-#         #MobileField
-#         driver.find_element_by_xpath(
-#             "/html/body/div[1]/div/div[2]/div[2]/form/div[2]/div[2]/input"
-#         ).send_keys(mobile_no)
-#         driver.find_element_by_xpath(
-#             "/html/body/div[1]/div/div[2]/div[2]/form/div[2]/div[2]/input"
-#         ).send_keys(Keys.ENTER)
-#         wait.until(
-#             EC.visibility_of_element_located((By.XPATH, "//span[@ng-click='$close(data)']"))
-#         )
-#         driver.find_element_by_xpath("//span[@ng-click='$close(data)']").click()
-#         #Wrong mobile number error
-#         try:
-#             wrong_number = WebDriverWait(driver, 10).until(
-#                 EC.visibility_of_element_located((By.XPATH, "//label[@my-i18n='login_incorrect_number']"))
-#             )
-#             if wrong_number:
-#                 return {"resp":"Code can't be sent. You entered a wrong phone number format.","status": 400}
-#         except BaseException as e:
-#             print("1. Success, Mobile number correct")
-#         try:
-#             #Check for too many times error
-#             too_many_times = driver.find_element_by_xpath("/html/body/div[5]/div[2]/div/div/div[2]/button").is_displayed()
-#             if too_many_times:
-#                 return {"resp":"Code can't be sent. You are performing too many actions. Please try again later.", "status":400}
-#         except BaseException as e:
-#             print("2. Success, No too many times error")
-#         print("3. ", "Success, Code has been Sent")
-#         return {"resp":"Code has been sent", "status":200}
-
-#     except BaseException as e:
-#         print("Error: ", e)
-#         return {"resp":"We are experiencing a problem sending the code", "status":400}
+'''
+Start process
+'''
 
 
-# @celery.task(name="Authorize verification code")
-# def verify_code(my_code, pid):
-#     try:
-#         driver2 = webdriver.Remote(command_executor=executor_url, desired_capabilities={})
-#         driver2.session_id = session_id
-#         print (driver2.current_url)
-#         driver2.find_element_by_xpath(
-#             "/html/body/div[1]/div/div[2]/div[2]/form/div[4]/input"
-#         ).send_keys(my_code)
-#         print(pid, my_code, ">>>>>>>>>>>>>>>>>")
-#         wait.until(
-#             lambda driver: driver2.current_url == 'https://web.telegram.org/#/im')
-#         driver2.implicitly_wait(5)
-#         process = Message.query.filter(
-#             Message.id == int(pid)
-#             ).first()
-#         driver2.get(process.link)
-    # wait.until(
-    #     lambda driver: driver2.current_url == process.link)
-    # if process.link == driver2.current_url:
-    #     new_process = update_process(pid)
-    #     iterations=0
-    #     while True:
-    #         time.sleep(random.randint(-9, 9) + int(new_process.duration)*int(environ.get('TIME_MEASURE_SECONDS')))
-    #         textarea = driver2.find_element_by_xpath(
-    #             "/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div[3]/div[2]/div/div/div/form/div[2]/div[5]").send_keys(new_process.message)
-    #         driver2.find_element_by_xpath(
-    #             "/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div[3]/div[2]/div/div/div/form/div[3]/button").click()
-    #         iterations += 1
-    #         new_process.iterations = iterations
-    #         db.session.commit()  # Commits all changes
-    # else:
-    #     driver2.close()
-    #     return {"message":"Messaging Started", "status": 200}
-    # except BaseException as e:
-    #     print("Error: ",e)
-    #     driver2.close()
-    #     return {"message":"We are having trouble starting your messaging service. Try again later", "status": 400 }
+@app.route("/start_process", methods=['POST'])
+@login_required
+def start_process():
+    data = request.get_json()
+    pid = data['pid']
+    process = Message.query.filter(
+        Message.id == int(pid) and Message.owner == current_user.id
+    ).first()
+
+    session_id = process.session_id
+    executor_url = process.executor_url
+    logger.info(f"SESSION ID: {session_id} EXECUTOR_URL: {executor_url}")
+    if not session_id or not executor_url:
+        return make_response(f"You are currently not authenticated on telegram", 400)
+    driver3 = webdriver.Remote(
+        command_executor=executor_url, desired_capabilities={})
+    if driver3.session_id != session_id:
+        close_driver(driver3)
+    driver3.session_id = session_id
+    new_process = Message.query.filter(
+        Message.id == int(pid)
+    ).first()
+    iterations = 0
+    while True:
+        time.sleep(random.randint(-1, 1) + int(new_process.duration)
+                   * int(environ.get('TIME_MEASURE_SECONDS')))
+        driver3.find_element_by_xpath(
+            "/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div[3]/div[2]/div/div/div/form/div[2]/div[5]").send_keys(new_process.message)
+        driver3.find_element_by_xpath(
+            "/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div[3]/div[2]/div/div/div/form/div[2]/div[5]").send_keys(Keys.ENTER)
+        iterations += 1
+        new_process.created = dt.now()
+        new_process.iterations = iterations
+        new_process.on = True
+        db.session.commit()  # Commits all changes
 
 
-@app.route('/stop')
+'''
+Stop Process
+'''
+
+
+@app.route('/stop_process', methods=['POST'])
 def stop_process():
     try:
-        pid = request.args.get("pid")
+        data = request.get_json()
+        pid = data["pid"]
         existing_process = Message.query.filter(
             Message.id == int(pid)
         ).first()
+        driver4 = webdriver.Remote(
+            command_executor=existing_process.executor_url, desired_capabilities={})
+        if driver4.session_id != existing_process.session_id:
+            close_driver(driver4)
+        driver4.session_id = existing_process.session_id
         existing_process.on = False
-        close_driver(driver)
-        return make_response("Stopped")
+        existing_process.session_id = None
+        existing_process.executor_url = None
+        db.session.commit()  # Commits all changes
+        close_driver(driver4)
+        return make_response("Messaging has been stopped", 200)
     except BaseException as e:
         error_logger(e)
+        return make_response("We experienced a problem while stopping the messaging process", 200)
 
 
 @login_manager.user_loader

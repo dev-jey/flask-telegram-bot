@@ -130,6 +130,21 @@ class Message(db.Model):
         nullable=False
     )
 
+    session_id = db.Column(
+        db.Text,
+        index=False,
+        unique=True,
+        nullable=True
+    )
+
+    executor_url = db.Column(
+        db.Text,
+        index=False,
+        unique=True,
+        nullable=True
+    )
+
+
     created = db.Column(
         db.DateTime,
         index=False,

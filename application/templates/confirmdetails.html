@@ -22,12 +22,13 @@
 
 
 <div class="verified-msg">
-    {% if channel_name %}
+    {% if channel_name and channel_members != 'null' %}
     <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="" class="verified-logo">
+    <p class="pid3" hidden>{{pid}}</p>
     <h3>{{channel_name}}</h3>
     <p>{{channel_members}}</p>
     <!-- <br> -->
-    <a href="/" class="back-to-main-site">Confirm</a>
+    <a href="/" class="back-to-main-site" id="confirm-start">Confirm</a>
     {% else %}
 
     <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="" class="verified-logo">

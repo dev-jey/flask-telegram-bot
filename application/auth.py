@@ -19,20 +19,7 @@ def sign_up(username, email, password, confirm_password):
         already_existing = verify_existing(username, email)
         if already_existing:
             return already_existing
-        password_hash = generate_password_hash(password)
-        new_user = User(
-            username=username.lower(),
-            email=email.lower(),
-            created=dt.now(),
-            password=password_hash,
-            activated=False,
-            authenticated=False,
-            paid=False,
-            admin=False
-        )
-        db.session.add(new_user)  # Adds new User record to database
-        db.session.commit()  # Commits all changes
-        return account_verification_email_send(username, email)
+        return account_verification_email_send(username, email, password)
     except BaseException as e:
         print(e)
         return make_response(f"We are experiencing some trouble creating your account. Please try again", 400)
@@ -98,9 +85,22 @@ def verify_existing(username, email):
 
 
 '''Send account verification email'''
-def account_verification_email_send(username, email):
+def account_verification_email_send(username, email, password):
     try:
         send_activation_email.delay(username, email)
+        password_hash = generate_password_hash(password)
+        new_user = User(
+            username=username.lower(),
+            email=email.lower(),
+            created=dt.now(),
+            password=password_hash,
+            activated=False,
+            authenticated=False,
+            paid=False,
+            admin=False
+        )
+        db.session.add(new_user)  # Adds new User record to database
+        db.session.commit()  # Commits all changes
         return make_response(f"We've sent an email to {email}. Open it to activate your account. May take up to 5mins", 200)
     except BaseException as e:
         print("Email sending failed: ", e)

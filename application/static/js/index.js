@@ -428,18 +428,56 @@ function editMessage(e) {
 /**
  * Send code to Mobile
  */
-// Start message
+// Start and stop message
 $(".start-message").click(function (e) {
     e.preventDefault();
     openMobileForm(e);
-})
+});
+
+$(".stop-message").click(function (e) {
+    e.preventDefault();
+    stopMessaging(e);
+});
 
 $("#mobile-form").submit(function (e) {
     e.preventDefault();
     sendVerificationCode();
 })
 
+function stopMessaging(e){
+    var pid = e.target.id;
+    $.ajax({
+        url: "/stop_process",
+        type: "POST",
+        contentType: "application/json",
+        crossDomain: true,
+        global: true,
+        data: JSON.stringify({ pid: pid }),
+        success: function (data) {
+            $("#return-message").html(data.message);
+            setTimeout(function () {
+                window.location.replace("/home");
+            }, 500);
+        },
+        error: function (error) {
+            displayAlert('error');
+            $("#return-message").html(error.responseText);
+            setTimeout(function () {
+                window.location.replace("/home");
+            }, 500);
+        },
+        beforeSend: function () {
+            $(".stop-message").prop({ "disabled": true, "value": "Loading" });
+        },
+        complete: function () {
+            $(".stop-message").prop({ "disabled": false, "value": "Stop Messaging" });
+        }
+    });
+}
+
+
 function sendVerificationCode() {
+    var pid = $(".pid").text();
     var mobileNo = $("#mobile").val();
     var code = $("#code").val();
     if (!code) {
@@ -459,7 +497,7 @@ function sendVerificationCode() {
         contentType: "application/json",
         crossDomain: true,
         global: true,
-        data: JSON.stringify({ code: code, mobile: mobileNo }),
+        data: JSON.stringify({ pid:pid, code: code, mobile: mobileNo }),
         success: function (data) {
             displayAlert('success');
             $("#return-message").html(data);
@@ -530,6 +568,46 @@ function verifyCode() {
         },
         complete: function () {
             $("#verify-submit").prop({ "disabled": false, "value": "Verify" });
+        }
+    });
+}
+
+
+
+/**
+ * Confirm the start of the process
+ */
+$("#confirm-start").click(function (e) {
+    e.preventDefault();
+    confirmStart();
+})
+function confirmStart() {
+    pid = $(".pid3").text();
+    $.ajax({
+        url: "/start_process",
+        type: "POST",
+        contentType: "application/json",
+        crossDomain: true,
+        global: true,
+        data: JSON.stringify({ pid: pid }),
+        success: function (data) {
+            $("#return-message").html(data.message);
+            setTimeout(function () {
+                window.location.replace("/home");
+            }, 500);
+        },
+        error: function (error) {
+            displayAlert('error');
+            $("#return-message").html(error.responseText);
+            setTimeout(function () {
+                window.location.replace("/home");
+            }, 500);
+        },
+        beforeSend: function () {
+            $("#confirm-start").prop({ "disabled": true, "value": "Loading" });
+        },
+        complete: function () {
+            $("#confirm-start").prop({ "disabled": false, "value": "Confirm" });
         }
     });
 }

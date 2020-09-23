@@ -61,9 +61,9 @@ def validateAddForm(name, duration, message):
     if message == ""  or message is None:
         invalid = True
         return make_response(f"Enter a message", 400)
-    if int(duration) < 30:
-        invalid = True
-        return make_response(f"Duration (minutes) must be more than 30", 400)
+    # if int(duration) < 30:
+    #     invalid = True
+    #     return make_response(f"Duration (minutes) must be more than 30", 400)
     if int(duration) > 3600:
         invalid = True
         return make_response(f"Duration (minutes) must be less than 3600", 400)

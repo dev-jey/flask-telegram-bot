@@ -383,14 +383,15 @@ a {
     background-size: 100%;
 }
 
-.start-message{
+.start-message, .stop-message{
     display: grid;
     width: 100%;
     position: absolute;
     bottom: 0;
-    background: var(--main-bg-color);
+    background: green;
     color: #fff;
-    border:#fff 1px solid; max-width: 350px;
+    border:#fff 1px solid; 
+    max-width: 350px;
     cursor: pointer;     
     max-width: 100%;
     height: 40px; 
@@ -434,16 +435,27 @@ a {
 
 .start-message:hover{
     background: linear-gradient(to right,  rgb(228, 255, 254), rgba(255, 255, 255,.2),  rgb(228, 255, 254));
-    color: var(--main-bg-color);
+    color: green;
     border-top: var(--main-bg-color) solid 1px;
 }
 
-.start-message:focus{
+.start-message:focus, .stop-message:focus{
     outline: none;
     border: none;
     border-top: var(--main-bg-color) solid 1px;
 }
-
+.stop-message{
+    background-color: red;
+    color: #fff;
+}
+.stop-message:hover{
+    background-color: #fff;
+    color: red;
+    border-top: 1px solid red;
+}
+.stop-message:focus{
+    border-top: red;
+}
 .flip-card-back__content{
     margin-top: 95px;
     padding: .05rem 1rem
