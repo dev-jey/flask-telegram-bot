@@ -30,3 +30,5 @@ class Config:
     #Background tasks
     CELERY_RESULT_BACKEND = environ.get('REDIS_URL')
     CELERY_BROKER_URL = environ.get('REDIS_URL')
+    CELERY_RESULT_SERIALIZER = 'json'
+    CELERY_EAGER_PROPAGATES_EXCEPTIONS = True

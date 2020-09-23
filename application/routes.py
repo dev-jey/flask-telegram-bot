@@ -41,9 +41,6 @@ app.permanent_session_lifetime = datetime.timedelta(days=365)
 logger = logging.getLogger(__name__)
 
 # set log level
-# logger.setLevel(logging.INFO)
-
-# logging.basicConfig()
 logging.basicConfig(level=logging.INFO,
                     format="\n\n{asctime:<12} '\n----------------------\n{levelname}: {message}\n----------------------\n' ({filename}:{lineno})\n\n", style="{")
 
@@ -331,7 +328,6 @@ def verify_mobile_code():
                     (By.XPATH, "//label[@my-i18n='login_incorrect_sms_code']"))
             )
             if wrong_code:
-                close_driver(driver2)
                 return make_response(f"Kindly enter the correct code.", 400)
         except BaseException as e:
             logger.info("Entered code is correct")
@@ -373,11 +369,16 @@ def verify_mobile_code():
 
         logger.info(f"Channel Name: {channel_name}")
         logger.info(f"Channel_members: {channel_members}")
-        return make_response(jsonify({
-            "message": "Confirm channel details to proceed",
+        payload = {
             "pid": pid,
             "channel_name": channel_name,
             "channel_members": channel_members
+        }
+        token = jwt.encode(payload, os.environ.get('SECRET_KEY'),
+                           algorithm='HS256').decode('utf-8')
+        return make_response(jsonify({
+            "message": "Confirm channel details to proceed",
+            "token": token
         }), 200)
 
     except BaseException as e:
@@ -394,13 +395,26 @@ Channel/Group/Name Details
 @app.route("/confirm_details", methods=['GET'])
 @login_required
 def confirm_channel_details():
-    pid = request.args.get("pid", None)
-    channel_name = request.args.get("channel_name", None)
-    channel_members = request.args.get("channel_members", None)
-    profile_img = request.args.get("profile_img", None)
+    token = None
+    payload = None
+    pid = None
+    channel_name = None
+    channel_members = None
+    try:
+        token = request.args.get('token', None)
+        payload = jwt.decode(token, os.environ.get('SECRET_KEY'))
+        pid = payload['pid']
+        channel_name = payload['channel_name']
+        channel_members = payload['channel_members']
+    except BaseException as e:
+        logger.info(f"Error {e}")
+        return render_template("confirmdetails.html",
+                               pid=pid, channel_name=channel_name,
+                               channel_members=channel_members
+                               )
     return render_template("confirmdetails.html",
                            pid=pid, channel_name=channel_name,
-                           channel_members=channel_members, profile_img=profile_img
+                           channel_members=channel_members
                            )
 
 
@@ -428,10 +442,8 @@ def start_process():
         send_automated_messages.delay(pid)
         return make_response(f"Success. The process automation will start soon", 200)
     except BaseException as e:
-        print(e)
-        return make_response(f"We are having trouble starting the process. Please try again later", 200)
-
-
+        logger.info(f"An error occurred : {e}")
+        return make_response(f"We are having trouble starting the process. Please try again later", 400)
 
 
 '''

@@ -18,7 +18,7 @@ from .models import db, Message
 mail = Mail(app)
 
 
-@celery.task(name='Send Activation Email')
+@celery.task(name='Send Activation Email', autoretry_for=(Exception,), retry_kwargs={'max_retries': 5, 'countdown': 2})
 def send_activation_email(username, email):
     msg = Message('Telegram Textbot - Account verification required',
                   sender=os.environ.get('MAIL_USERNAME'), recipients=[email])
@@ -36,34 +36,38 @@ def send_activation_email(username, email):
     mail.send(msg)
 
 
-@celery.task(name='Send automated messages')
+@celery.task(name='Send automated messages', autoretry_for=(Exception,), retry_kwargs={'max_retries': 5, 'countdown': 2})
 def send_automated_messages(pid):
-    process = Message.query.filter(
-        Message.id == int(pid) and Message.owner == current_user.id
-    ).first()
+    process = None
+    try:
+        process = Message.query.filter(
+            Message.id == int(pid) and Message.owner == current_user.id
+        ).first()
+    except BaseException:
+        return {"Error": "Kindly reauthenticate to proceed"}
     session_id = process.session_id
     executor_url = process.executor_url
     if not session_id or not executor_url:
-        return make_response(f"You are currently not authenticated on telegram", 400)
+        return {"Error": "You are currently not authenticated on telegram"}
     driver3 = webdriver.Remote(
-            command_executor=executor_url, desired_capabilities={})
+        command_executor=executor_url, desired_capabilities={})
     if driver3.session_id != session_id:
         driver3.close()
         driver3.quit()
     driver3.session_id = session_id
-    new_process = Message.query.filter(
-        Message.id == int(pid)
-    ).first()
-    iterations = new_process.iterations or 0
-    while True:
-        time.sleep(random.randint(-1, 1) + int(new_process.duration)
-                   * int(os.environ.get('TIME_MEASURE_SECONDS')))
-        driver3.find_element_by_xpath(
-            "/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div[3]/div[2]/div/div/div/form/div[2]/div[5]").send_keys(new_process.message)
-        driver3.find_element_by_xpath(
-            "/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div[3]/div[2]/div/div/div/form/div[2]/div[5]").send_keys(Keys.ENTER)
-        iterations += 1
-        new_process.created = dt.now()
-        new_process.iterations = iterations
-        new_process.on = True
-        db.session.commit()  # Commits all changes
+    iterations = process.iterations or 0
+    try:
+        while True:
+            driver3.find_element_by_xpath(
+                "/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div[3]/div[2]/div/div/div/form/div[2]/div[5]").send_keys(process.message)
+            driver3.find_element_by_xpath(
+                "/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div[3]/div[2]/div/div/div/form/div[2]/div[5]").send_keys(Keys.ENTER)
+            iterations += 1
+            process.created = dt.now()
+            process.iterations = iterations
+            process.on = True
+            db.session.commit()  # Commits all changes
+            time.sleep(random.randint(-1, 1) + int(process.duration)
+                       * int(os.environ.get('TIME_MEASURE_SECONDS')))
+    except BaseException:
+        return {"Error": f"Process session_id {session_id} stopped"}

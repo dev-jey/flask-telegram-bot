@@ -28,7 +28,7 @@
     <h3>{{channel_name}}</h3>
     <p>{{channel_members}}</p>
     <!-- <br> -->
-    <a href="/" class="back-to-main-site" id="confirm-start">Confirm</a>
+    <input type="button" class="back-to-main-site" id="confirm-start" value="Confirm">
     {% else %}
 
     <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="" class="verified-logo">

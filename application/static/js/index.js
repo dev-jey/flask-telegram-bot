@@ -454,17 +454,18 @@ function stopMessaging(e){
         global: true,
         data: JSON.stringify({ pid: pid }),
         success: function (data) {
-            $("#return-message").html(data.message);
+            displayAlert('success');
+            $("#return-message").html(data);
             setTimeout(function () {
                 window.location.replace("/home");
-            }, 500);
+            }, 5000);
         },
         error: function (error) {
             displayAlert('error');
             $("#return-message").html(error.responseText);
             setTimeout(function () {
                 window.location.replace("/home");
-            }, 500);
+            }, 5000);
         },
         beforeSend: function () {
             $(".stop-message").prop({ "disabled": true, "value": "Loading" });
@@ -547,9 +548,10 @@ function verifyCode() {
         global: true,
         data: JSON.stringify({ my_code: my_code, pid: pid }),
         success: function (data) {
-            const { pid, channel_name, channel_members } = data;
-            window.location.replace(`/confirm_details?pid=${pid}&channel_name=${channel_name}&channel_members=${channel_members}`);
-            $("#return-message").html(data.message);
+            const { token, message } = data;
+            window.location.replace(`/confirm_details?token=${token}`);
+            displayAlert('success');
+            $("#return-message").html(message);
             setTimeout(function () {
                 closeVerifyPage();
             }, 500);
@@ -591,23 +593,26 @@ function confirmStart() {
         global: true,
         data: JSON.stringify({ pid: pid }),
         success: function (data) {
-            $("#return-message").html(data.message);
+            displayAlert('success', 10000);
+            $("#return-message").html("We will start the process in a short while");
             setTimeout(function () {
                 window.location.replace("/home");
-            }, 500);
+            }, 3000);
         },
         error: function (error) {
             displayAlert('error');
             $("#return-message").html(error.responseText);
             setTimeout(function () {
                 window.location.replace("/home");
-            }, 500);
+            }, 3000);
         },
         beforeSend: function () {
+            displayAlert('success', 10000);
+            $("#return-message").html("We will start the process in a short while");
             $("#confirm-start").prop({ "disabled": true, "value": "Loading" });
         },
         complete: function () {
-            $("#confirm-start").prop({ "disabled": false, "value": "Confirm" });
+            $("#confirm-start").prop({ "disabled": true, "value": "Confirm" });
         }
     });
 }
