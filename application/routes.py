@@ -5,6 +5,7 @@ import json
 import os
 import jwt
 import random
+import   logging
 from os import environ
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime as dt
@@ -36,6 +37,19 @@ options.add_experimental_option("detach", True)
 if os.environ.get('FLASK_ENV') == 'production':
     options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
 app.permanent_session_lifetime = datetime.timedelta(days=365)
+
+
+
+
+
+logger = logging.getLogger(__name__)  
+
+# set log level
+# logger.setLevel(logging.INFO)
+
+# logging.basicConfig()
+logging.basicConfig(level=logging.INFO, format="{levelname}::{asctime:<12} '{message}' ({filename}:{lineno})", style="{")
+
 
 
 '''
@@ -78,7 +92,7 @@ def home():
         messages = get_all_messages(current_user)
         return render_template("messages.html", user=current_user, messages=messages)
     except BaseException as e:
-        print(e)
+        error_logger(e)
         return redirect(url_for("welcome"))
 
 
@@ -117,7 +131,7 @@ def activate_account(token):
         return render_template("verified.html", msg=msg, username=username)
 
     except BaseException as e:
-        print(e)
+        error_logger(e)
         msg = f"The activation link is either broken or expired"
         return render_template("verified.html", msg=msg)
 
@@ -147,7 +161,7 @@ def login():
                 return make_response(f'Login Successful', 200)
         return make_response(f'Wrong credentials! Try again', 403)
     except BaseException as e:
-        print("Error", e)
+        error_logger(e)
         return make_response(f'We are experiencing some trouble logging you in. Please try again', 403)
 
 
@@ -188,7 +202,7 @@ def open_edit_message(message_id):
         ).first()
         return render_template('editmessage.html', message_details=message_details)
     except BaseException as e:
-        print(e)
+        error_logger(e)
         return render_template('editmessage.html', message_details=None)
 
 
@@ -225,7 +239,7 @@ def send_code():
 
         session['session_id'] = session_id
         session['executor_url'] = executor_url
-        print(executor_url, ">>>>><<<<<<<", session_id)
+        logger.info(f"{executor_url} >>>>><<<<<<< {session_id}")
         if code == "" or code is None:
             driver.close()
             driver.quit()
@@ -259,6 +273,7 @@ def send_code():
             "//button[@ng-click='$close(data)']").click()
         # Wrong mobile number error
         try:
+            logger.info(f"Mobile no: {mobile_no}")
             wrong_number = WebDriverWait(driver, 10).until(
                 EC.visibility_of_element_located(
                     (By.XPATH, "//label[@my-i18n='login_incorrect_number']"))
@@ -268,10 +283,10 @@ def send_code():
                 driver.quit()
                 return make_response(f"Code can't be sent. You entered a wrong phone number format.", 400)
         except BaseException as e:
-            print("1. Success, Mobile number correct")
+            logger.info("1. Success, Mobile number correct")
         try:
             # Check for too many times error
-            import pdb; pdb.set_trace()
+            # import pdb; pdb.set_trace()
             too_many_times = WebDriverWait(driver, 1).until(
                 EC.visibility_of_element_located(
                     (By.XPATH, "//button[@ng-click='$dismiss()']")))
@@ -280,11 +295,11 @@ def send_code():
                 driver.quit()
                 return make_response(f"Code can't be sent. You are performing too many actions. Please try again later.", 400)
         except BaseException as e:
-            print("2. Success, No too many times error")
-        print("3. ", "Success, Code has been Sent")
+            logger.info("2. Success, No too many times error")
+        logger.info("3. ", "Success, Code has been Sent")
         return make_response(f"Code has been sent", 200)
     except BaseException as e:
-        print("Error: ", e)
+        error_logger(e)
         driver.close()
         driver.quit()
         return make_response(f"We are experiencing a problem sending the code", 400)
@@ -313,8 +328,8 @@ def verify_mobile_code():
             driver2.quit()
             return make_response(f"Code must be  5 digits.", 400)
         pid = data["pid"]
-        print(my_code, pid, ">>>>>>>>>>>>>>>>>>>>>>>>>>")
-        print("SessionID", driver2.session_id)
+        logger.info(f"My_code: {my_code} PID: {pid} >>>>>>>>>>>>>>>>>>>>>>>>>>")
+        logger.info(f"SessionID {driver2.session_id}")
         wait = WebDriverWait(driver2, 10000)
         wait.until(EC.visibility_of_element_located(
             (By.XPATH, "//input[@ng-model='credentials.phone_code']")))
@@ -330,7 +345,7 @@ def verify_mobile_code():
                 driver2.quit()
                 return make_response(f"Kindly enter the correct code.", 400)
         except BaseException as e:
-            print(e, "Entered code is correct")
+            logger.info("Entered code is correct")
         wait.until(
             lambda driver: driver2.current_url == 'https://web.telegram.org/#/im')
         wait.until(EC.visibility_of_element_located(
@@ -346,7 +361,7 @@ def verify_mobile_code():
                 driver2.quit()
                 return make_response(f"The given channel or group or username doesnot exist on your account.", 400)
         except BaseException as e:
-            print(e, 'Search results found')
+            logger.info('Search results found')
 
         driver2.find_elements_by_xpath(
             "//a[@ng-mousedown='dialogSelect(myResult.peerString)']")[0].click()
@@ -365,9 +380,9 @@ def verify_mobile_code():
         except:
             pass
 
-        print("Channel Name: ", channel_name)
-        print("Channel_members", channel_members)
-        print("Profile_img_link", profile_img)
+        logger.info(f"Channel Name: {channel_name}")
+        logger.info(f"Channel_members: {channel_members}")
+        logger.info(f"Profile_img_link: {profile_img}")
 
         driver2.find_element_by_xpath("//a[@ng-click='goToHistory()']").click()
 
@@ -379,7 +394,7 @@ def verify_mobile_code():
     except BaseException as e:
         driver2.close()
         driver2.quit()
-        print("Error ", e)
+        error_logger(e)
         return make_response(f"We experienced a problem verifying your code.", 400)
 
 
@@ -481,7 +496,7 @@ def stop_process():
         driver.close()
         return make_response("Stopped")
     except BaseException as e:
-        print(e)
+        error_logger(e)
 
 
 @login_manager.user_loader
@@ -507,3 +522,11 @@ def page_not_found(e):
 @app.errorhandler(500)
 def internal_server_error(e):
     return render_template('500.html'), 500
+
+
+
+'''
+Error logger helper
+'''
+def error_logger(e):
+    return logger.error(f'An error occurred: {e}')
