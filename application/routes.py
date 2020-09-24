@@ -30,11 +30,15 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 
 options = webdriver.ChromeOptions()
-options.add_argument("--no-sandbox")
+options.add_argument("--window-size=1920,1080")
 options.add_argument('--disable-gpu')
-options.add_argument("--incognito")
+options.add_argument("disable-infobars")
+options.add_argument("--disable-extensions")
+options.add_argument("--no-sandbox")
 options.add_argument("--headless")
-options.add_experimental_option("detach", True)
+options.add_argument("--disable-setuid-sandbox") 
+options.add_argument("--remote-debugging-port=9222")
+options.add_argument("--disable-dev-shm-usage")
 if os.environ.get('FLASK_ENV') == 'production':
     options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
 app.permanent_session_lifetime = datetime.timedelta(days=1)
