@@ -55,7 +55,6 @@ def send_automated_messages(pid):
                 command_executor=executor_url, desired_capabilities={})
         if driver3.session_id != session_id:
             driver3.close()
-            driver3.quit()
         driver3.session_id = session_id
         iterations = process.iterations or 0
         try:
@@ -77,7 +76,7 @@ def send_automated_messages(pid):
             process.executor_url = None
             db.session.commit()  
             driver3.close()
-            driver3.quit()
+            # driver3.quit()
             return {"Error": f"{e}Process session_id {session_id} restarting"}    
     except BaseException as e:
             return {"Error": f"{e}Process session_id {session_id} stopped"}

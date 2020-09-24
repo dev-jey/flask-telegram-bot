@@ -10,7 +10,7 @@ import logging
 from os import environ
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime as dt
-from flask import Flask, render_template, request, redirect, url_for, flash, make_response, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, make_response, session, jsonify, abort
 from flask import current_app as app
 from flask_login import login_required, logout_user, current_user, login_user
 from .factory import login_manager
@@ -470,7 +470,7 @@ Close and Quit the current driver
 
 def close_driver(driver):
     driver.close()
-    driver.quit()
+    # driver.quit()
 
 
 '''
