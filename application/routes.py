@@ -265,17 +265,18 @@ def send_code():
         driver.find_element_by_xpath(
             "//button[@ng-click='$close(data)']").click()
         # Wrong mobile number error
-        # try:
-        #     logger.info(f"Mobile no: {mobile_no}")
-        #     wrong_number = WebDriverWait(driver, 10).until(
-        #         EC.visibility_of_element_located(
-        #             (By.XPATH, "//label[@my-i18n='login_incorrect_number']"))
-        #     )
-        #     if wrong_number:
-        #         close_driver(driver)
-        #         return make_response(f"Code can't be sent. You entered a wrong phone number format.", 400)
-        # except BaseException as e:
-        #     logger.info("1. Success, Mobile number correct")
+        try:
+            logger.info(f"Mobile no: {mobile_no}")
+            wrong_number = WebDriverWait(driver, 10).until(
+                EC.visibility_of_element_located(
+                    (By.XPATH, "//label[@my-i18n='login_incorrect_number']"))
+            )
+            if wrong_number:
+                print("WRONG NUMBER           ", wrong_number)
+                close_driver(driver)
+                return make_response(f"Code can't be sent. You entered a wrong phone number format.", 400)
+        except BaseException as e:
+            logger.info("1. Success, Mobile number correct")
         try:
             # Check for too many times error
             too_many_times = WebDriverWait(driver, 1).until(
@@ -286,8 +287,8 @@ def send_code():
                 return make_response(f"Code can't be sent. You are performing too many actions. Please try again later.", 400)
         except BaseException as e:
             logger.info("2. Success, No too many times error")
-        if not driver.find_element_by_xpath("//input[@ng-model='credentials.phone_code']").is_displayed():
-            return make_response(f"We are experiencing a problem sending the code", 400)
+        # if not driver.find_element_by_xpath("//input[@ng-model='credentials.phone_code']").is_displayed():
+        #     return make_response(f"We are experiencing a problem sending the code", 400)
         return make_response(f"Code has been sent. Check your messages or telegram app", 200)
     except BaseException as e:
         error_logger(e)
