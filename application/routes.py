@@ -267,12 +267,12 @@ def send_code():
         # Wrong mobile number error
         try:
             logger.info(f"Mobile no: {mobile_no}")
-            wrong_number = WebDriverWait(driver, 10).until(
+            WebDriverWait(driver, 10).until(
                 EC.visibility_of_element_located(
                     (By.XPATH, "//label[@my-i18n='login_incorrect_number']"))
             )
-            if wrong_number:
-                print("WRONG NUMBER           ", wrong_number)
+            if driver.find_element_by_xpath("//label[@my-i18n='login_incorrect_number']").is_displayed():
+                print("WRONG NUMBER           ", driver.find_element_by_xpath("//label[@my-i18n='login_incorrect_number']"))
                 close_driver(driver)
                 return make_response(f"Code can't be sent. You entered a wrong phone number format.", 400)
         except BaseException as e:
