@@ -265,21 +265,21 @@ def send_code():
         driver.find_element_by_xpath(
             "//button[@ng-click='$close(data)']").click()
         # Wrong mobile number error
-        try:
-            logger.info(f"Mobile no: {mobile_no}")
-            WebDriverWait(driver, 10).until(
-                EC.visibility_of_element_located(
-                    (By.XPATH, "//label[@my-i18n='login_incorrect_number']"))
-            )
-            if driver.find_element_by_xpath("//label[@my-i18n='login_incorrect_number']").is_displayed():
-                print("WRONG NUMBER           ", driver.find_element_by_xpath("//label[@my-i18n='login_incorrect_number']"))
-                close_driver(driver)
-                return make_response(f"Code can't be sent. You entered a wrong phone number format.", 400)
-        except BaseException as e:
-            logger.info("1. Success, Mobile number correct")
+        # try:
+        #     logger.info(f"Mobile no: {mobile_no}")
+        #     WebDriverWait(driver, 10).until(
+        #         EC.visibility_of_element_located(
+        #             (By.XPATH, "//label[@my-i18n='login_incorrect_number']"))
+        #     )
+        #     if driver.find_element_by_xpath("//label[@my-i18n='login_incorrect_number']").is_displayed():
+        #         print("WRONG NUMBER           ", driver.find_element_by_xpath("//label[@my-i18n='login_incorrect_number']"))
+        #         close_driver(driver)
+        #         return make_response(f"Code can't be sent. You entered a wrong phone number format.", 400)
+        # except BaseException as e:
+        #     logger.info("1. Success, Mobile number correct")
         try:
             # Check for too many times error
-            too_many_times = WebDriverWait(driver, 1).until(
+            too_many_times = WebDriverWait(driver, 10).until(
                 EC.visibility_of_element_located(
                     (By.XPATH, "//button[@ng-click='$dismiss()']")))
             if too_many_times:
