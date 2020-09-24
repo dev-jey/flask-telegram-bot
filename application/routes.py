@@ -31,12 +31,13 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 options = webdriver.ChromeOptions()
 options.add_argument("--no-sandbox")
+options.add_argument('--disable-gpu')
 options.add_argument("--incognito")
 options.add_argument("--headless")
 options.add_experimental_option("detach", True)
 if os.environ.get('FLASK_ENV') == 'production':
     options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
-app.permanent_session_lifetime = datetime.timedelta(days=365)
+app.permanent_session_lifetime = datetime.timedelta(days=1)
 
 
 logger = logging.getLogger(__name__)
@@ -265,18 +266,18 @@ def send_code():
         driver.find_element_by_xpath(
             "//button[@ng-click='$close(data)']").click()
         # Wrong mobile number error
-        # try:
-        #     logger.info(f"Mobile no: {mobile_no}")
-        #     WebDriverWait(driver, 10).until(
-        #         EC.visibility_of_element_located(
-        #             (By.XPATH, "//label[@my-i18n='login_incorrect_number']"))
-        #     )
-        #     if driver.find_element_by_xpath("//label[@my-i18n='login_incorrect_number']").is_displayed():
-        #         print("WRONG NUMBER           ", driver.find_element_by_xpath("//label[@my-i18n='login_incorrect_number']"))
-        #         close_driver(driver)
-        #         return make_response(f"Code can't be sent. You entered a wrong phone number format.", 400)
-        # except BaseException as e:
-        #     logger.info("1. Success, Mobile number correct")
+        try:
+            logger.info(f"Mobile no: {mobile_no}")
+            WebDriverWait(driver, 10).until(
+                EC.visibility_of_element_located(
+                    (By.XPATH, "//label[@my-i18n='login_incorrect_number']"))
+            )
+            if driver.find_element_by_xpath("//label[@my-i18n='login_incorrect_number']").is_displayed():
+                print("WRONG NUMBER           ", driver.find_element_by_xpath("//label[@my-i18n='login_incorrect_number']"))
+                close_driver(driver)
+                return make_response(f"Code can't be sent. You entered a wrong phone number format.", 400)
+        except BaseException as e:
+            logger.info("1. Success, Mobile number correct")
         try:
             # Check for too many times error
             too_many_times = WebDriverWait(driver, 10).until(
@@ -287,8 +288,8 @@ def send_code():
                 return make_response(f"Code can't be sent. You are performing too many actions. Please try again later.", 400)
         except BaseException as e:
             logger.info("2. Success, No too many times error")
-        # if not driver.find_element_by_xpath("//input[@ng-model='credentials.phone_code']").is_displayed():
-        #     return make_response(f"We are experiencing a problem sending the code", 400)
+        if not driver.find_element_by_xpath("//input[@ng-model='credentials.phone_code']").is_displayed():
+            return make_response(f"We are experiencing a problem sending the code", 400)
         return make_response(f"Code has been sent. Check your messages or telegram app", 200)
     except BaseException as e:
         error_logger(e)

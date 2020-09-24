@@ -388,7 +388,7 @@ a {
     width: 100%;
     position: absolute;
     bottom: 0;
-    background: green;
+    background: var(--main-bg-color);
     color: #fff;
     border:#fff 1px solid; 
     max-width: 350px;
@@ -435,7 +435,7 @@ a {
 
 .start-message:hover{
     background: linear-gradient(to right,  rgb(228, 255, 254), rgba(255, 255, 255,.2),  rgb(228, 255, 254));
-    color: green;
+    color: #000;
     border-top: var(--main-bg-color) solid 1px;
 }
 
