@@ -18,7 +18,7 @@ from .models import db, Message
 mail = Mail(app)
 
 
-@celery.task(name='Send Activation Email', autoretry_for=(Exception,), retry_kwargs={'max_retries': 5, 'countdown': 2})
+@celery.task(name='Send Activation Email')
 def send_activation_email(username, email):
     msg = Message('Telegram Textbot - Account verification required',
                   sender=os.environ.get('MAIL_USERNAME'), recipients=[email])
@@ -36,7 +36,7 @@ def send_activation_email(username, email):
     mail.send(msg)
 
 
-@celery.task(name='Send automated messages', autoretry_for=(Exception,), retry_kwargs={'max_retries': 5, 'countdown': 2})
+@celery.task(name='Send automated messages')
 def send_automated_messages(pid):
     try:
         process = None

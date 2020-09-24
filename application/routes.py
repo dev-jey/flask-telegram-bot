@@ -285,8 +285,8 @@ def send_code():
             )
             driver.find_element_by_xpath(
                 "//button[@ng-click='$close(data)']").click()
-        except:
-            close_driver(driver)
+        except BaseException as e:
+            # close_driver(driver)
             error_logger(e)
             return make_response(f"We are experiencing a problem sending the code", 400)
         # Wrong mobile number error
@@ -298,7 +298,7 @@ def send_code():
             )
             if driver.find_element_by_xpath("//label[@my-i18n='login_incorrect_number']").is_displayed():
                 print("WRONG NUMBER ", driver.find_element_by_xpath("//label[@my-i18n='login_incorrect_number']"))
-                close_driver(driver)
+                # close_driver(driver)
                 return make_response(f"Code can't be sent. You entered a wrong phone number format.", 400)
         except BaseException as e:
             logger.info("1. Success, Mobile number correct")
