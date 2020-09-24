@@ -1,5 +1,6 @@
 import time
 import datetime
+import threading
 import re
 import json
 import os
@@ -136,8 +137,6 @@ def login():
         data = request.get_json()
         user = data['email']
         password = data['password']
-        # if current_user.is_authenticated:
-        #     return redirect(url_for('home'))
         if not user or not password:
             return make_response(f"Enter your username/email and password", 400)
         existing_username = None
@@ -266,17 +265,17 @@ def send_code():
         driver.find_element_by_xpath(
             "//button[@ng-click='$close(data)']").click()
         # Wrong mobile number error
-        try:
-            logger.info(f"Mobile no: {mobile_no}")
-            wrong_number = WebDriverWait(driver, 10).until(
-                EC.visibility_of_element_located(
-                    (By.XPATH, "//label[@my-i18n='login_incorrect_number']"))
-            )
-            if wrong_number:
-                close_driver(driver)
-                return make_response(f"Code can't be sent. You entered a wrong phone number format.", 400)
-        except BaseException as e:
-            logger.info("1. Success, Mobile number correct")
+        # try:
+        #     logger.info(f"Mobile no: {mobile_no}")
+        #     wrong_number = WebDriverWait(driver, 10).until(
+        #         EC.visibility_of_element_located(
+        #             (By.XPATH, "//label[@my-i18n='login_incorrect_number']"))
+        #     )
+        #     if wrong_number:
+        #         close_driver(driver)
+        #         return make_response(f"Code can't be sent. You entered a wrong phone number format.", 400)
+        # except BaseException as e:
+        #     logger.info("1. Success, Mobile number correct")
         try:
             # Check for too many times error
             too_many_times = WebDriverWait(driver, 1).until(
