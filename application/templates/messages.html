@@ -14,7 +14,8 @@
     </div>
     <form class="mobile-form" id="mobile-form" method="POST">
         <h1>Enter Mobile Number</h1>
-        <p>Enter your mobile number below. A verification code will be <br> sent to your mobile phone (Either in the telegram <br> mobile app or text messages)</p><br>
+        <p>Enter your mobile number below. A verification code will be <br> sent to your mobile phone (Either in the
+            telegram <br> mobile app or text messages)</p><br>
         <p class="pid" hidden></p>
         <input type="number" name="code" id="code" class="input-fields" placeholder="+254"
             onkeydown="javascript: return event.keyCode == 69 ? false : true"><br>
@@ -63,15 +64,18 @@
 
 
 {% block content%}
-{% if messages|length == 0 %}
-<div class="verified-msg">
-    <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="" class="verified-logo">
-    You do not have any messages yet
-    <br>
-    <a href="/new" class="back-to-main-site">Create a Message Now</a>
-</div>
-{% else %}
+{% if data %}
 <section class="content-section-messages" id="all-messages">
+    <div class="admin-stats">
+        {% if user.admin %}
+        <div>Total processes: {{data.total_processes}}</div>
+        <div>Running processes: {{data.running_processes}}</div>
+        <div>Total users: {{data.total_users}}</div>
+        <div>Logged In Users: {{data.logged_in_users}}</div>
+        {% endif %}
+        <br>
+        <br>
+    </div>
     <div class="section-header">
         <div class="section-title">
             <h1>All Messages</h1>
@@ -82,7 +86,7 @@
     </div>
 
     <div class="section-content">
-        {% for message in messages %}
+        {% for message in data.messages %}
         <div class="card-container">
             <div class="section-content__card">
                 <div class="flip-card-front">
@@ -115,5 +119,13 @@
         {% endfor %}
     </div>
 </section>
+{% else %}
+
+<div class="verified-msg">
+    <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="" class="verified-logo">
+    You do not have any messages yet
+    <br>
+    <a href="/new" class="back-to-main-site">Create a Message Now</a>
+</div>
 {% endif %}
 {% endblock %}

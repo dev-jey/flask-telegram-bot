@@ -326,9 +326,18 @@ $("#logout-mobile").click(function (e) {
 function logout() {
     $.ajax({
         url: "/logout",
-        type: "GET",
+        type: "POST",
         crossDomain: true,
         global: true
+        ,success: function (data) {
+            displayAlert('success');
+            $("#return-message").html(data);
+        },
+        error: function (error) {
+            displayAlert('error');
+            $("#return-message").html(error.responseText);
+        }
+
     });
     window.location.replace("/")
 }
@@ -444,7 +453,7 @@ $("#mobile-form").submit(function (e) {
     sendVerificationCode();
 })
 
-function stopMessaging(e){
+function stopMessaging(e) {
     var pid = e.target.id;
     $.ajax({
         url: "/stop_process",
@@ -498,7 +507,7 @@ function sendVerificationCode() {
         contentType: "application/json",
         crossDomain: true,
         global: true,
-        data: JSON.stringify({ pid:pid, code: code, mobile: mobileNo }),
+        data: JSON.stringify({ pid: pid, code: code, mobile: mobileNo }),
         success: function (data) {
             displayAlert('success');
             $("#return-message").html(data);
@@ -560,7 +569,12 @@ function verifyCode() {
             displayAlert('error');
             if (error.status == 404) {
                 $("#return-message").html(error.responseText);
-                window.location.replace(`/confirm_details`);
+                window.location.replace(`/confirm_details?token=incorrect`);
+                return;
+            }
+            if (error.status == 401) {
+                $("#return-message").html(error.responseText);
+                window.location.replace(`/home`);
                 return;
             }
             $("#return-message").html(error.responseText);
@@ -597,14 +611,14 @@ function confirmStart() {
             $("#return-message").html("We will start the process in a short while");
             setTimeout(function () {
                 window.location.replace("/home");
-            }, 3000);
+            }, 10000);
         },
         error: function (error) {
             displayAlert('error');
             $("#return-message").html(error.responseText);
             setTimeout(function () {
                 window.location.replace("/home");
-            }, 3000);
+            }, 10000);
         },
         beforeSend: function () {
             displayAlert('success', 10000);
