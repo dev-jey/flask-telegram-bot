@@ -12,7 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
-from .models import db, Message
+from .models import db, Message  as  Msg
 
 
 mail = Mail(app)
@@ -20,7 +20,7 @@ mail = Mail(app)
 
 @celery.task(name='Send Activation Email')
 def send_activation_email(username, email):
-    msg = Message('Telegram Textbot - Account verification required',
+    msg = Message(subject='Telegram Textbot - Account verification required',
                   sender=os.environ.get('MAIL_USERNAME'), recipients=[email])
     payload = {
         'email': email.lower(),
@@ -41,8 +41,8 @@ def send_automated_messages(pid):
     try:
         process = None
         try:
-            process = Message.query.filter(
-                Message.id == int(pid) and Message.owner == current_user.id
+            process = Msg.query.filter(
+                Msg.id == int(pid) and Msg.owner == current_user.id
             ).first()
         except BaseException:
             return {"Error": "Kindly reauthenticate to proceed"}
@@ -53,8 +53,8 @@ def send_automated_messages(pid):
 
         driver3 = webdriver.Remote(
                 command_executor=executor_url, desired_capabilities={})
-        if driver3.session_id != session_id:
-            driver3.close()
+        # if driver3.session_id != session_id:
+        #     driver3.close()
         driver3.session_id = session_id
         iterations = process.iterations or 0
         try:
