@@ -28,7 +28,11 @@
     <h3>{{channel_name}}</h3>
     <p>{{channel_members}}</p>
     <!-- <br> -->
+    {% if can_send %}
     <input type="button" class="back-to-main-site" id="confirm-start" value="Confirm">
+    {% else %}
+    <p><b>You can't send messages to this channel</b></p>
+    {% endif %}
     {% else %}
 
     <img src="{{ url_for('static', filename='images/telegram-logo.svg') }}" alt="" class="verified-logo">

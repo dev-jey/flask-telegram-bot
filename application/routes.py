@@ -88,8 +88,8 @@ def new_process():
 @login_required
 def home():
     try:
-        messages = get_all_messages(current_user)
-        return render_template("messages.html", user=current_user, messages=messages)
+        data = get_all_messages(current_user)
+        return render_template("messages.html", user=current_user, data=data )
     except BaseException as e:
         error_logger(e)
         return redirect(url_for("welcome"))
@@ -152,8 +152,11 @@ def login():
             User.username == user).first()
         if existing_username or existing_email:
             user = existing_username or existing_email
-            user.authenticated = True
             if check_password_hash(user.password, password):
+                if not user.activated:
+                    return make_response(f"We sent  an activation link to your email. Open it to continue", 400)
+                user.authenticated = True
+                db.session.commit()
                 login_user(user, remember=True)
                 return make_response(f'Login Successful', 200)
         return make_response(f'Wrong credentials! Try again', 403)
@@ -162,16 +165,20 @@ def login():
         return make_response(f'We are experiencing some trouble logging you in. Please try again', 403)
 
 
-@app.route('/logout')
+@app.route('/logout', methods=["POST"])
 @login_required
 def logout():
     """Logout via query string parameters."""
-    user = current_user
-    user.authenticated = False
-    db.session.add(user)
-    db.session.commit()
-    logout_user()
-    return redirect(url_for("welcome"))
+    try:
+        user = current_user
+        user.authenticated = False
+        db.session.add(user)
+        db.session.commit()
+        logout_user()
+        return make_response(f'Logout successful', 200)
+    except Exception as e:
+        return make_response(f'We are having trouble logging you out. Try again later', 400)
+
 
 
 '''
@@ -219,13 +226,17 @@ def edit_a_message():
 @login_required
 def send_code():
     global driver
-    if os.environ.get('FLASK_ENV') == 'production':
-        driver = webdriver.Chrome(executable_path=str(
-            os.environ.get('CHROMEDRIVER_PATH')), options=options)
-    else:
-        driver = webdriver.Chrome(
-            ChromeDriverManager().install(), options=options)
-    wait = WebDriverWait(driver, 10000)
+    try:
+        if os.environ.get('FLASK_ENV') == 'production':
+            driver = webdriver.Chrome(executable_path=str(
+                os.environ.get('CHROMEDRIVER_PATH')), options=options)
+        else:
+            driver = webdriver.Chrome(
+                ChromeDriverManager().install(), options=options)
+    except Exception as e:
+        print(e)
+        return make_response(f"We are having trouble processing your request. Please check your internet connection", 400)
+    wait = WebDriverWait(driver, 30)
     executor_url = driver.command_executor._url
     session_id = driver.session_id
     try:
@@ -251,24 +262,33 @@ def send_code():
             lambda driver: driver.current_url == 'https://web.telegram.org/#/login')
         wait.until(
             EC.element_to_be_clickable((By.XPATH, "/html/body/div[1]/div/div[2]/div[2]/form/div[2]/div[1]/input")))
-
         # Codefield
-        driver.find_element_by_xpath(
+        code_field = driver.find_element_by_xpath(
             "/html/body/div[1]/div/div[2]/div[2]/form/div[2]/div[1]/input"
-        ).send_keys(code)
+        )
+        code_field.clear()
+        code_field.send_keys(code)
         # MobileField
-        driver.find_element_by_xpath(
+        mobile_field = driver.find_element_by_xpath(
             "/html/body/div[1]/div/div[2]/div[2]/form/div[2]/div[2]/input"
-        ).send_keys(mobile_no)
+        )
+        mobile_field.clear()
+        mobile_field.send_keys(mobile_no)
+        driver.implicitly_wait(3)
         driver.find_element_by_xpath(
             "/html/body/div[1]/div/div[2]/div[2]/form/div[2]/div[2]/input"
         ).send_keys(Keys.ENTER)
-        wait.until(
-            EC.visibility_of_element_located(
-                (By.XPATH, "//button[@ng-click='$close(data)']"))
-        )
-        driver.find_element_by_xpath(
-            "//button[@ng-click='$close(data)']").click()
+        try:
+            wait.until(
+                EC.visibility_of_element_located(
+                    (By.XPATH, "//button[@ng-click='$close(data)']"))
+            )
+            driver.find_element_by_xpath(
+                "//button[@ng-click='$close(data)']").click()
+        except:
+            close_driver(driver)
+            error_logger(e)
+            return make_response(f"We are experiencing a problem sending the code", 400)
         # Wrong mobile number error
         try:
             logger.info(f"Mobile no: {mobile_no}")
@@ -277,7 +297,7 @@ def send_code():
                     (By.XPATH, "//label[@my-i18n='login_incorrect_number']"))
             )
             if driver.find_element_by_xpath("//label[@my-i18n='login_incorrect_number']").is_displayed():
-                print("WRONG NUMBER           ", driver.find_element_by_xpath("//label[@my-i18n='login_incorrect_number']"))
+                print("WRONG NUMBER ", driver.find_element_by_xpath("//label[@my-i18n='login_incorrect_number']"))
                 close_driver(driver)
                 return make_response(f"Code can't be sent. You entered a wrong phone number format.", 400)
         except BaseException as e:
@@ -292,7 +312,9 @@ def send_code():
                 return make_response(f"Code can't be sent. You are performing too many actions. Please try again later.", 400)
         except BaseException as e:
             logger.info("2. Success, No too many times error")
-        if not driver.find_element_by_xpath("//input[@ng-model='credentials.phone_code']").is_displayed():
+        try:
+            driver.find_element_by_xpath("//input[@ng-model='credentials.phone_code']").is_displayed()
+        except:
             return make_response(f"We are experiencing a problem sending the code", 400)
         return make_response(f"Code has been sent. Check your messages or telegram app", 200)
     except BaseException as e:
@@ -312,21 +334,31 @@ def verify_mobile_code():
     if len(my_code) != 5:
         return make_response(f"Code must be  5 digits.", 400)
     logger.info(f"My_code: {my_code} PID: {pid}")
-    process = Message.query.filter(
-        Message.id == int(pid)
-    ).first()
-    driver2 = webdriver.Remote(
-        command_executor=process.executor_url, desired_capabilities={})
+    try:
+        process = Message.query.filter(
+            Message.id == int(pid)
+        ).first()
+    except:
+        return make_response(f"We are having trouble processing your request.", 400)
+
+    try:
+        driver2 = webdriver.Remote(
+            command_executor=process.executor_url, desired_capabilities={})
+    except Exception as e:
+        return make_response(f"We are having trouble processing your request. Please check your internet connection", 400)
+
     if driver2.session_id != process.session_id:
         close_driver(driver2)
     driver2.session_id = process.session_id
     logger.info(f"SessionID {driver2.session_id}")
-    wait = WebDriverWait(driver2, 10000)
+    wait = WebDriverWait(driver2, 30)
     try:
         wait.until(EC.visibility_of_element_located(
             (By.XPATH, "//input[@ng-model='credentials.phone_code']")))
-        driver2.find_element_by_xpath(
-            "//input[@ng-model='credentials.phone_code']").send_keys(my_code)
+        phone_input = driver2.find_element_by_xpath(
+            "//input[@ng-model='credentials.phone_code']")
+        phone_input.clear()
+        phone_input.send_keys(my_code)
         try:
             wrong_code = WebDriverWait(driver2, 10).until(
                 EC.visibility_of_element_located(
@@ -366,16 +398,21 @@ def verify_mobile_code():
         channel_name = driver2.find_element_by_xpath(
             "//span[@my-peer-link='historyPeer.id']").text
         channel_members = None
+        can_send = None
         try:
             channel_members = driver2.find_element_by_xpath(
                 "//span[@my-chat-status='-historyPeer.id']").text
+            can_send = driver2.find_element_by_xpath(
+                    "/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div[3]/div[2]/div/div/div/form/div[2]/div[5]").is_displayed()
         except:
             pass
 
         logger.info(f"Channel Name: {channel_name}")
         logger.info(f"Channel_members: {channel_members}")
+        logger.info(f"Can Send: {can_send}")
         payload = {
             "pid": pid,
+            "can_send": can_send,
             "channel_name": channel_name,
             "channel_members": channel_members
         }
@@ -389,7 +426,7 @@ def verify_mobile_code():
     except BaseException as e:
         close_driver(driver2)
         error_logger(e)
-        return make_response("We experienced a problem verifying your code.", 400)
+        return make_response("We experienced a problem verifying your code.", 401)
 
 
 '''
@@ -409,16 +446,19 @@ def confirm_channel_details():
         token = request.args.get('token', None)
         payload = jwt.decode(token, os.environ.get('SECRET_KEY'))
         pid = payload['pid']
+        can_send = payload['can_send']
         channel_name = payload['channel_name']
         channel_members = payload['channel_members']
     except BaseException as e:
         logger.info(f"Error {e}")
         return render_template("confirmdetails.html",
                                pid=pid, channel_name=channel_name,
+                               can_send=can_send,
                                channel_members=channel_members
                                )
     return render_template("confirmdetails.html",
                            pid=pid, channel_name=channel_name,
+                           can_send=can_send,
                            channel_members=channel_members
                            )
 
@@ -477,7 +517,7 @@ def stop_process():
         return make_response("Messaging has been stopped", 200)
     except BaseException as e:
         error_logger(e)
-        return make_response("We experienced a problem while stopping the messaging process", 200)
+        return make_response("We experienced a problem while stopping the messaging process", 400)
 
 
 @login_manager.user_loader
