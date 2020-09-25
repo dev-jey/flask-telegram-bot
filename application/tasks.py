@@ -30,7 +30,7 @@ def send_activation_email(username, email):
     token = jwt.encode(payload, os.environ.get('SECRET_KEY'),
                        algorithm='HS256').decode('utf-8')
     link = os.environ.get('CURRENT_URL') + \
-        f"verify/{token}"
+        f"/verify/{token}"
     msg.html = render_template(
         'activation.html', title='Verify Your Account', username=username, link=link)
     mail.send(msg)
