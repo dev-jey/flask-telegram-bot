@@ -37,47 +37,27 @@ def send_activation_email(username, email):
 
 
 @celery.task(name='Send automated messages')
-def send_automated_messages(pid):
+def send_automated_messages(pid, driver3, process):
     try:
-        process = None
-        try:
-            process = Msg.query.filter(
-                Msg.id == int(pid) and Msg.owner == current_user.id
-            ).first()
-        except BaseException:
-            return {"Error": "Kindly reauthenticate to proceed"}
-        session_id = process.session_id
-        executor_url = process.executor_url
-        if not session_id or not executor_url:
-            return {"Error": "You are currently not authenticated on telegram"}
-
-        driver3 = webdriver.Remote(
-                command_executor=executor_url, desired_capabilities={})
-        # if driver3.session_id != session_id:
-        #     driver3.close()
-        driver3.session_id = session_id
         iterations = process.iterations or 0
-        try:
-            while True:
-                driver3.find_element_by_xpath(
-                    "/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div[3]/div[2]/div/div/div/form/div[2]/div[5]").send_keys(process.message)
-                driver3.find_element_by_xpath(
-                    "/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div[3]/div[2]/div/div/div/form/div[2]/div[5]").send_keys(Keys.ENTER)
-                iterations += 1
-                process.created = dt.now()
-                process.iterations = iterations
-                process.on = True
-                db.session.commit()  # Commits all changes
-                time.sleep(random.randint(-1, 1) + int(process.duration)
-                        * int(os.environ.get('TIME_MEASURE_SECONDS')))
-        except BaseException as e:
-            process.on = False
-            process.session_id = None
-            process.executor_url = None
-            db.session.commit()  
-            driver3.close()
-            # driver3.quit()
-            return {"Error": f"{e}Process session_id {session_id} stopping abruptly"}    
+        while True:
+            driver3.find_element_by_xpath(
+                "/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div[3]/div[2]/div/div/div/form/div[2]/div[5]").send_keys(process.message)
+            driver3.find_element_by_xpath(
+                "/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div[3]/div[2]/div/div/div/form/div[2]/div[5]").send_keys(Keys.ENTER)
+            iterations += 1
+            process.created = dt.now()
+            process.iterations = iterations
+            process.on = True
+            db.session.commit()  # Commits all changes
+            time.sleep(random.randint(-1, 1) + int(process.duration)
+                    * int(os.environ.get('TIME_MEASURE_SECONDS')))
     except BaseException as e:
-            return {"Error": f"{e}Process session_id {session_id} was stopped"}
+        process.on = False
+        process.session_id = None
+        process.executor_url = None
+        db.session.commit()  
+        driver3.close()
+        # driver3.quit()
+        return {"Error": f"{e}Process session_id {process.session_id} stopping abruptly"}    
 

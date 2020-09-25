@@ -447,7 +447,24 @@ def start_process():
     try:
         data = request.get_json()
         pid = data['pid']
-        send_automated_messages.delay(pid)
+        process = None
+        try:
+            process = Message.query.filter(
+                Message.id == int(pid) and Message.owner == current_user.id
+            ).first()
+        except BaseException:
+            return {"Error": "Kindly reauthenticate to proceed"}
+        session_id = process.session_id
+        executor_url = process.executor_url
+        if not session_id or not executor_url:
+            return {"Error": "You are currently not authenticated on telegram"}
+
+        driver3 = webdriver.Remote(
+                command_executor=executor_url, desired_capabilities={})
+        # if driver3.session_id != session_id:
+        #     driver3.close()
+        driver3.session_id = session_id
+        send_automated_messages.delay(pid, driver3, process)
         return make_response(f"Success. The process automation will start soon", 200)
     except BaseException as e:
         logger.info(f"An error occurred : {e}")
