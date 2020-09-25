@@ -98,14 +98,27 @@ $("#go-to-login").click(function (e) {
 // Functions
 function openMobileForm(e) {
     $(".pid").html(e.target.id);
-    $(".pid2").html(e.target.id);
     $("#mobile-page").addClass("show");
+    $("#confirm-form").css("display", "none");
+    $("#verify-form").css("display", "none");
+    $("#mobile-form").css("display", "block");
     $("#x-mobile").css("display", "block");
 }
 
+function closeMobile() {
+    $("#mobile-form").css("display", "none");
+    $("#x-mobile").css("display", "none");
+    $("#mobile-page").removeClass("show");
+}
+
 function openVerifyPage() {
-    $("#verify-page").addClass("show");
-    $("#x-verify").css("display", "block");
+    $("#mobile-form").css("display", "none");
+    $("#verify-form").css("display", "block");
+}
+
+function openConfirmPage() {
+    $("#verify-form").css("display", "none");
+    $("#confirm-form").css("display", "block");
 }
 
 function openSignup() {
@@ -139,15 +152,6 @@ function closeMenu() {
     $("#x-menu").css("display", "none");
 }
 
-function closeMobile() {
-    $("#mobile-page").removeClass("show");
-    $("#x-mobile").css("display", "none");
-}
-
-function closeVerifyPage() {
-    $("#verify-page").removeClass("show");
-    $("#x-verify").css("display", "none");
-}
 
 
 /**
@@ -512,7 +516,6 @@ function sendVerificationCode() {
             displayAlert('success');
             $("#return-message").html(data);
             setTimeout(function () {
-                closeMobile();
                 openVerifyPage();
             }, 500);
         },
@@ -542,7 +545,7 @@ $("#verify-form").submit(function (e) {
 
 function verifyCode() {
     var my_code = $("#verification").val();
-    var pid = $(".pid2").text();
+    var pid = $(".pid").text();
     if (!my_code) {
         displayAlert('error');
         $("#return-message").html("Enter the code received on your mobile phone");
@@ -557,26 +560,38 @@ function verifyCode() {
         global: true,
         data: JSON.stringify({ my_code: my_code, pid: pid }),
         success: function (data) {
-            const { token, message } = data;
-            window.location.replace(`/confirm_details?token=${token}`);
+            const { channel_name, channel_members, can_send, message } = data;
             displayAlert('success');
             $("#return-message").html(message);
             setTimeout(function () {
-                closeVerifyPage();
+                $("#channel_name").html(channel_name);
+                $("#channel_members").html(channel_members);
+                if(can_send){
+                    $("#confirm-start").css("display", "block")
+                }else{
+                    $("#cant_text").css("display", "block")
+                    $("#cant_text").html("*You cant send messages <br> to this channel*");
+                    $(".view-all-messages").css("display", "block");
+                }
+                openConfirmPage();
             }, 500);
         },
         error: function (error) {
-            displayAlert('error');
             if (error.status == 404) {
-                $("#return-message").html(error.responseText);
-                window.location.replace(`/confirm_details?token=incorrect`);
+                $("#confirm-title").html("Channel or group name not found");
+                $("#confirm-desc").html("Ensure that you give a channel or group <br> that you are a member of.");
+                $(".view-all-messages").css("display", "block");
+                openConfirmPage();
                 return;
             }
             if (error.status == 401) {
-                $("#return-message").html(error.responseText);
-                window.location.replace(`/home`);
+                $("#confirm-title").html("Code was not verified");
+                $("#confirm-desc").html("We experienced an error while verifying your code.");
+                $(".view-all-messages").css("display", "block");
+                openConfirmPage();
                 return;
             }
+            displayAlert('error');
             $("#return-message").html(error.responseText);
         },
         beforeSend: function () {
@@ -598,7 +613,7 @@ $("#confirm-start").click(function (e) {
     confirmStart();
 })
 function confirmStart() {
-    pid = $(".pid3").text();
+    pid = $(".pid").text();
     $.ajax({
         url: "/start_process",
         type: "POST",

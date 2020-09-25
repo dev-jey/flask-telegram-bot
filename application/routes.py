@@ -91,7 +91,7 @@ def home():
         data = get_all_messages(current_user)
         return render_template("messages.html", user=current_user, data=data )
     except BaseException as e:
-        error_logger(e)
+        logger.error(f'An error occurred: {e}')
         return redirect(url_for("welcome"))
 
 
@@ -130,7 +130,7 @@ def activate_account(token):
         return render_template("verified.html", msg=msg, username=username)
 
     except BaseException as e:
-        error_logger(e)
+        logger.error(f'An error occurred: {e}')
         msg = f"The activation link is either broken or expired"
         return render_template("verified.html", msg=msg)
 
@@ -161,7 +161,7 @@ def login():
                 return make_response(f'Login Successful', 200)
         return make_response(f'Wrong credentials! Try again', 403)
     except BaseException as e:
-        error_logger(e)
+        logger.error(f'An error occurred: {e}')
         return make_response(f'We are experiencing some trouble logging you in. Please try again', 403)
 
 
@@ -206,7 +206,7 @@ def open_edit_message(message_id):
         ).first()
         return render_template('editmessage.html', message_details=message_details)
     except BaseException as e:
-        error_logger(e)
+        logger.error(f'An error occurred: {e}')
         return render_template('editmessage.html', message_details=None)
 
 
@@ -247,6 +247,7 @@ def send_code():
         process = Message.query.filter(
             Message.id == int(pid)
         ).first()
+        # import pdb; pdb.set_trace()
         process.session_id = session_id
         process.executor_url = executor_url
         db.session.commit()
@@ -287,7 +288,7 @@ def send_code():
                 "//button[@ng-click='$close(data)']").click()
         except BaseException as e:
             # close_driver(driver)
-            error_logger(e)
+            logger.error(f'An error occurred: {e}')
             return make_response(f"We are experiencing a problem sending the code", 400)
         # Wrong mobile number error
         try:
@@ -318,7 +319,7 @@ def send_code():
             return make_response(f"We are experiencing a problem sending the code", 400)
         return make_response(f"Code has been sent. Check your messages or telegram app", 200)
     except BaseException as e:
-        error_logger(e)
+        logger.error(f'An error occurred: {e}')
         # close_driver(driver)
         return make_response(f"We are experiencing a problem sending the code", 400)
 
@@ -409,58 +410,19 @@ def verify_mobile_code():
 
         logger.info(f"Channel Name: {channel_name}")
         logger.info(f"Channel_members: {channel_members}")
-        logger.info(f"Can Send: {can_send}")
-        payload = {
-            "pid": pid,
+
+        return make_response(jsonify({
+            "message": "Confirm channel details to proceed",
             "can_send": can_send,
             "channel_name": channel_name,
             "channel_members": channel_members
-        }
-        token = jwt.encode(payload, os.environ.get('SECRET_KEY'),
-                           algorithm='HS256').decode('utf-8')
-        return make_response(jsonify({
-            "message": "Confirm channel details to proceed",
-            "token": token
         }), 200)
 
     except BaseException as e:
         # close_driver(driver2)
-        error_logger(e)
+        logger.error(f'An error occurred: {e}')
         return make_response("We experienced a problem verifying your code.", 401)
 
-
-'''
-Channel/Group/Name Details
-'''
-
-
-@app.route("/confirm_details", methods=['GET'])
-@login_required
-def confirm_channel_details():
-    token = None
-    payload = None
-    pid = None
-    channel_name = None
-    channel_members = None
-    try:
-        token = request.args.get('token', None)
-        payload = jwt.decode(token, os.environ.get('SECRET_KEY'))
-        pid = payload['pid']
-        can_send = payload['can_send']
-        channel_name = payload['channel_name']
-        channel_members = payload['channel_members']
-    except BaseException as e:
-        logger.info(f"Error {e}")
-        return render_template("confirmdetails.html",
-                               pid=pid, channel_name=channel_name,
-                               can_send=can_send,
-                               channel_members=channel_members
-                               )
-    return render_template("confirmdetails.html",
-                           pid=pid, channel_name=channel_name,
-                           can_send=can_send,
-                           channel_members=channel_members
-                           )
 
 
 '''
@@ -516,7 +478,7 @@ def stop_process():
         close_driver(driver4)
         return make_response("Messaging has been stopped", 200)
     except BaseException as e:
-        error_logger(e)
+        logger.error(f'An error occurred: {e}')
         return make_response("We experienced a problem while stopping the messaging process", 400)
 
 
@@ -549,6 +511,3 @@ def internal_server_error(e):
 Error logger helper
 '''
 
-
-def error_logger(e):
-    return logger.error(f'An error occurred: {e}')

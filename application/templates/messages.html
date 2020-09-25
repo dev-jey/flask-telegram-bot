@@ -2,6 +2,7 @@
 {% block title %}Messages{% endblock %}
 {% block modals %}
 {{ super() }}
+
 <!--
         Enter mobile number Modal
     -->
@@ -18,32 +19,32 @@
             telegram <br> mobile app or text messages)</p><br>
         <p class="pid" hidden></p>
         <input type="number" name="code" id="code" class="input-fields" placeholder="+254"
-            onkeydown="javascript: return event.keyCode == 69 ? false : true"><br>
+            onkeydown="javascript: return event.keyCode == 69 ? false : true"><br><br>
         <input type="number" name="mobile" id="mobile" class="input-fields" placeholder="712345678"
-            onkeydown="javascript: return event.keyCode == 69 ? false : true"><br>
+            onkeydown="javascript: return event.keyCode == 69 ? false : true"><br><br>
         <input type="submit" name="mobile-submit" id="mobile-submit" class="btn submit-btn" value="Send Code"><br>
     </form>
-</section>
 
-<!--
-        Enter verification code Modal
-    -->
-<section class="mobile-page" id="verify-page">
-    <img src="{{ url_for('static', filename='images/circles.svg') }}" class="circles-img-modal" alt="Circles">
-    <div class="x" id="x-verify">
-        <div class="close">
-            <div class="close-btn"></div>
-        </div>
-    </div>
+
     <form class="mobile-form" id="verify-form" method="POST">
         <h1>Enter Verification Code</h1>
         <p>Check your mobile phone for a <br> verification code.</p><br>
-        <p class="pid2" hidden></p>
         <input type="number" name="verification" id="verification" class="input-fields" placeholder="Verification No"
-            onkeydown="javascript: return event.keyCode == 69 ? false : true"><br>
+            onkeydown="javascript: return event.keyCode == 69 ? false : true"><br><br>
         <input type="submit" name="verify-submit" id="verify-submit" class="btn submit-btn" value="Verify"><br>
     </form>
+
+    <form class="mobile-form" id="confirm-form" method="POST">
+        <h1 id="confirm-title">Confirmation</h1>
+        <p  id="confirm-desc">Is this the channel or group that you <br> intend to send messages to?</p><br>
+        <h3 id="channel_name"></h3>
+        <h5 id="channel_members"></h5>
+        <p id="cant_text"></p>
+        <a href="/home" class="confirm-btn view-all-messages">Back To Messages</a>
+        <input type="button" class="confirm-btn" id="confirm-start" value="Confirm">
+    </form>
 </section>
+
 {% endblock %}
 {% block mobilemenu %}
 <a class="profile-name">Savalijey</a>
@@ -74,8 +75,9 @@
         <div>Logged In Users: {{data.logged_in_users}}</div>
         {% endif %}
         <br>
-        <br>
     </div>
+    <br>
+    <br>
     <div class="section-header">
         <div class="section-title">
             <h1>All Messages</h1>

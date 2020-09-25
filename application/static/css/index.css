@@ -501,7 +501,30 @@ a {
     z-index: 102;
     display: grid;
 }
-
+#mobile-form, #verify-form, #confirm-form, #confirm-start, .view-all-messages{
+    display: none;
+}
+.confirm-btn{
+    font-weight: bold;
+    margin:auto;
+    border-radius: 5px;
+    font-size: 14px;
+    padding: .5rem 1.5rem;
+    max-width: 190px;
+    background: #fff;
+    border: none;
+    outline:none;
+    cursor: pointer;
+    transition: background .5s, color .5s;
+}
+#channel_name, #channel_members{
+    color: #fff;
+}
+.confirm-btn:hover{
+    background: var(--main-bg-color);
+    border:  1px solid  #fff;
+    color:  #fff;
+}
 .x , .x-signup,.x-menu {
     float:right;
     justify-self: end;
@@ -939,17 +962,21 @@ a {
   grid-gap: 2rem;
 }
 .admin-stats div{
-    background-color: var(--main-bg-color);
+    background-color: #fff;
     border-radius: 5px;
-    color:#fff;
+    font-weight: bolder;
+    color:var(--main-bg-color);
     padding: 1rem;
     cursor: pointer;
-    border-left: none;
-    border-left:6px solid rgb(0, 77, 128);
-    transition: border-left .5s;
+    border:  1px   solid   var(--main-bg-color);
+    border-left:6px solid rgb(25, 136, 211);
+    border-right:6px solid rgb(25, 136, 211);
+    transition: border-left .5s, border-right .5s;
+    font-size: .85rem;
 }
 .admin-stats div:hover{
-    border-left:9px solid rgb(0, 77, 128);;
+    border-left:9px solid rgb(25, 136, 211);
+    border-right:9px solid rgb(25, 136, 211);
 }
 
 
