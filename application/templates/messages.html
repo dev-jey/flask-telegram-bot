@@ -64,7 +64,7 @@
 
 
 {% block content%}
-{% if data %}
+{% if data.messages|length > 0 %}
 <section class="content-section-messages" id="all-messages">
     <div class="admin-stats">
         {% if user.admin %}

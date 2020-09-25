@@ -77,7 +77,7 @@ def send_automated_messages(pid):
             db.session.commit()  
             driver3.close()
             # driver3.quit()
-            return {"Error": f"{e}Process session_id {session_id} restarting"}    
+            return {"Error": f"{e}Process session_id {session_id} stopping abruptly"}    
     except BaseException as e:
-            return {"Error": f"{e}Process session_id {session_id} stopped"}
+            return {"Error": f"{e}Process session_id {session_id} was stopped"}
 
