@@ -238,7 +238,7 @@ def send_code():
         return make_response(f"We are having trouble processing your request. Please check your internet connection", 400)
     wait = WebDriverWait(driver, 30)
     executor_url = driver.command_executor._url
-    executor_url = executor_url.replace('http://127.0.0.1', os.environ.get('CURRENT_URL'))
+    # executor_url = executor_url.replace('http://127.0.0.1', os.environ.get('CURRENT_URL'))
     session_id = driver.session_id
     try:
         data = request.get_json()
