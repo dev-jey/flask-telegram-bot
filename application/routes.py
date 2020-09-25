@@ -247,7 +247,6 @@ def send_code():
         process = Message.query.filter(
             Message.id == int(pid)
         ).first()
-        # import pdb; pdb.set_trace()
         process.session_id = session_id
         process.executor_url = executor_url
         db.session.commit()
@@ -372,7 +371,6 @@ def verify_mobile_code():
             "//input[@ng-model='search.query']").send_keys(saved_message.name)
         driver2.implicitly_wait(3)
         try:
-            import pdb; pdb.set_trace()
             search_results = driver2.find_elements_by_xpath(
                 "//a[@ng-mousedown='dialogSelect(myResult.peerString)']")
             search_results_alternate = driver2.find_elements_by_xpath(
@@ -382,11 +380,8 @@ def verify_mobile_code():
                 close_driver(driver2)
                 return make_response("The channel or group name was not found", 404)
         except BaseException as e:
-            import pdb; pdb.set_trace()
             logger.info('Search results found')
-        import pdb; pdb.set_trace()
         if search_results:
-            import pdb; pdb.set_trace()
             driver2.find_elements_by_xpath(
                 "//a[@ng-mousedown='dialogSelect(myResult.peerString)']")[0].click()
         if search_results_alternate:
