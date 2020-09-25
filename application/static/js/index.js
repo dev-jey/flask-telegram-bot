@@ -578,6 +578,8 @@ function verifyCode() {
         },
         error: function (error) {
             if (error.status == 404) {
+                displayAlert('error');
+                $("#return-message").html(error.responseText);
                 $("#confirm-title").html("Channel or group name not found");
                 $("#confirm-desc").html("Ensure that you give a channel or group <br> that you are a member of.");
                 $(".view-all-messages").css("display", "block");
@@ -585,8 +587,10 @@ function verifyCode() {
                 return;
             }
             if (error.status == 401) {
+                displayAlert('error');
+                $("#return-message").html(error.responseText);
                 $("#confirm-title").html("Code was not verified");
-                $("#confirm-desc").html("We experienced an error while verifying your code.");
+                $("#confirm-desc").html("We experienced an error while verifying your code.<br> Ensure you enter the correct code");
                 $(".view-all-messages").css("display", "block");
                 openConfirmPage();
                 return;

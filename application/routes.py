@@ -255,7 +255,7 @@ def send_code():
         if code == "" or code is None:
             close_driver(driver)
             return make_response(f"Enter a valid country code e.g 254", 400)
-        if mobile_no == "" or mobile_no is None:
+        if mobile_no == "" or mobile_no is None or len(mobile_no) < 6:
             close_driver(driver)
             return make_response(f"Enter a valid mobile no e.g 0712345678", 400)
         driver.get('https://web.telegram.org/#/login')
@@ -287,7 +287,7 @@ def send_code():
             driver.find_element_by_xpath(
                 "//button[@ng-click='$close(data)']").click()
         except BaseException as e:
-            close_driver(driver)
+            # close_driver(driver)
             logger.error(f'An error occurred: {e}')
             return make_response(f"We are experiencing a problem sending the code", 400)
         # Wrong mobile number error
@@ -315,7 +315,8 @@ def send_code():
             logger.info("2. Success, No too many times error")
         try:
             driver.find_element_by_xpath("//input[@ng-model='credentials.phone_code']").is_displayed()
-        except:
+        except:               
+            close_driver(driver)
             return make_response(f"We are experiencing a problem sending the code", 400)
         return make_response(f"Code has been sent. Check your messages or telegram app", 200)
     except BaseException as e:
@@ -360,15 +361,6 @@ def verify_mobile_code():
             "//input[@ng-model='credentials.phone_code']")
         phone_input.clear()
         phone_input.send_keys(my_code)
-        try:
-            wrong_code = WebDriverWait(driver2, 10).until(
-                EC.visibility_of_element_located(
-                    (By.XPATH, "//label[@my-i18n='login_incorrect_sms_code']"))
-            )
-            if wrong_code:
-                return make_response(f"Kindly enter the correct code.", 400)
-        except BaseException as e:
-            logger.info("Entered code is correct")
         wait.until(
             lambda driver: driver2.current_url == 'https://web.telegram.org/#/im')
         wait.until(EC.visibility_of_element_located(
@@ -380,6 +372,7 @@ def verify_mobile_code():
             "//input[@ng-model='search.query']").send_keys(saved_message.name)
         driver2.implicitly_wait(3)
         try:
+            import pdb; pdb.set_trace()
             search_results = driver2.find_elements_by_xpath(
                 "//a[@ng-mousedown='dialogSelect(myResult.peerString)']")
             search_results_alternate = driver2.find_elements_by_xpath(
@@ -389,8 +382,11 @@ def verify_mobile_code():
                 close_driver(driver2)
                 return make_response("The channel or group name was not found", 404)
         except BaseException as e:
+            import pdb; pdb.set_trace()
             logger.info('Search results found')
+        import pdb; pdb.set_trace()
         if search_results:
+            import pdb; pdb.set_trace()
             driver2.find_elements_by_xpath(
                 "//a[@ng-mousedown='dialogSelect(myResult.peerString)']")[0].click()
         if search_results_alternate:
