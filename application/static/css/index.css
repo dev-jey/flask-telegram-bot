@@ -517,6 +517,10 @@ a {
     cursor: pointer;
     transition: background .5s, color .5s;
 }
+#cant_text{
+    color: red;
+    font-weight: bolder;
+}
 #channel_name, #channel_members{
     color: #fff;
 }

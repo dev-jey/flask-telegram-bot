@@ -624,16 +624,16 @@ function confirmStart() {
         success: function (data) {
             displayAlert('success', 10000);
             $("#return-message").html("We will start the process in a short while");
-            // setTimeout(function () {
-            //     window.location.replace("/home");
-            // }, 10000);
+            setTimeout(function () {
+                window.location.replace("/home");
+            }, 10000);
         },
         error: function (error) {
             displayAlert('error');
             $("#return-message").html(error.responseText);
-            // setTimeout(function () {
-            //     window.location.replace("/home");
-            // }, 10000);
+            setTimeout(function () {
+                window.location.replace("/home");
+            }, 10000);
         },
         beforeSend: function () {
             displayAlert('success', 10000);

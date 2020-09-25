@@ -37,8 +37,25 @@ def send_activation_email(username, email):
 
 
 @celery.task(name='Send automated messages')
-def send_automated_messages(pid, driver3, process):
+def send_automated_messages(pid):
+    process = None
     try:
+        try:
+            process = Msg.query.filter(
+                Msg.id == int(pid) and Msg.owner == current_user.id
+            ).first()
+        except BaseException:
+            return {"Error": "Kindly reauthenticate to proceed"}
+        session_id = process.session_id
+        executor_url = process.executor_url
+        if not session_id or not executor_url:
+            return {"Error": "You are currently not authenticated on telegram"}
+
+        driver3 = webdriver.Remote(
+                command_executor=executor_url, desired_capabilities={})
+        if driver3.session_id != session_id:
+            driver3.close()
+        driver3.session_id = session_id
         iterations = process.iterations or 0
         while True:
             driver3.find_element_by_xpath(

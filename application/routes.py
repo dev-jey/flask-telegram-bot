@@ -238,7 +238,6 @@ def send_code():
         return make_response(f"We are having trouble processing your request. Please check your internet connection", 400)
     wait = WebDriverWait(driver, 30)
     executor_url = driver.command_executor._url
-    # executor_url = executor_url.replace('http://127.0.0.1', os.environ.get('CURRENT_URL'))
     session_id = driver.session_id
     try:
         data = request.get_json()
@@ -254,10 +253,10 @@ def send_code():
         db.session.commit()
         logger.info(f"EXECUTOR_URL: {executor_url}, SESSION_ID:{session_id}")
         if code == "" or code is None:
-            # close_driver(driver)
+            close_driver(driver)
             return make_response(f"Enter a valid country code e.g 254", 400)
         if mobile_no == "" or mobile_no is None:
-            # close_driver(driver)
+            close_driver(driver)
             return make_response(f"Enter a valid mobile no e.g 0712345678", 400)
         driver.get('https://web.telegram.org/#/login')
         wait.until(
@@ -288,7 +287,7 @@ def send_code():
             driver.find_element_by_xpath(
                 "//button[@ng-click='$close(data)']").click()
         except BaseException as e:
-            # close_driver(driver)
+            close_driver(driver)
             logger.error(f'An error occurred: {e}')
             return make_response(f"We are experiencing a problem sending the code", 400)
         # Wrong mobile number error
@@ -300,7 +299,7 @@ def send_code():
             )
             if driver.find_element_by_xpath("//label[@my-i18n='login_incorrect_number']").is_displayed():
                 print("WRONG NUMBER ", driver.find_element_by_xpath("//label[@my-i18n='login_incorrect_number']"))
-                # close_driver(driver)
+                close_driver(driver)
                 return make_response(f"Code can't be sent. You entered a wrong phone number format.", 400)
         except BaseException as e:
             logger.info("1. Success, Mobile number correct")
@@ -321,7 +320,7 @@ def send_code():
         return make_response(f"Code has been sent. Check your messages or telegram app", 200)
     except BaseException as e:
         logger.error(f'An error occurred: {e}')
-        # close_driver(driver)
+        close_driver(driver)
         return make_response(f"We are experiencing a problem sending the code", 400)
 
 
@@ -349,8 +348,8 @@ def verify_mobile_code():
     except Exception as e:
         return make_response(f"We are having trouble processing your request. Please check your internet connection", 400)
 
-    # if driver2.session_id != process.session_id:
-    #     close_driver(driver2)
+    if driver2.session_id != process.session_id:
+        close_driver(driver2)
     driver2.session_id = process.session_id
     logger.info(f"SessionID {driver2.session_id}")
     wait = WebDriverWait(driver2, 30)
@@ -387,7 +386,7 @@ def verify_mobile_code():
                 "//a[@ng-mousedown='dialogSelect(dialogMessage.peerString, dialogMessage.unreadCount == -1 && dialogMessage.mid)']"
             )
             if len(search_results) == 0 and len(search_results_alternate) == 0:
-                # close_driver(driver2)
+                close_driver(driver2)
                 return make_response("The channel or group name was not found", 404)
         except BaseException as e:
             logger.info('Search results found')
@@ -420,7 +419,7 @@ def verify_mobile_code():
         }), 200)
 
     except BaseException as e:
-        # close_driver(driver2)
+        close_driver(driver2)
         logger.error(f'An error occurred: {e}')
         return make_response("We experienced a problem verifying your code.", 401)
 
@@ -433,7 +432,7 @@ Close and Quit the current driver
 
 def close_driver(driver):
     driver.close()
-    # driver.quit()
+    driver.quit()
 
 
 '''
@@ -447,24 +446,7 @@ def start_process():
     try:
         data = request.get_json()
         pid = data['pid']
-        process = None
-        try:
-            process = Message.query.filter(
-                Message.id == int(pid) and Message.owner == current_user.id
-            ).first()
-        except BaseException:
-            return {"Error": "Kindly reauthenticate to proceed"}
-        session_id = process.session_id
-        executor_url = process.executor_url
-        if not session_id or not executor_url:
-            return {"Error": "You are currently not authenticated on telegram"}
-
-        driver3 = webdriver.Remote(
-                command_executor=executor_url, desired_capabilities={})
-        # if driver3.session_id != session_id:
-        #     driver3.close()
-        driver3.session_id = session_id
-        send_automated_messages.delay(pid, driver3, process)
+        send_automated_messages.delay(pid)
         return make_response(f"Success. The process automation will start soon", 200)
     except BaseException as e:
         logger.info(f"An error occurred : {e}")
