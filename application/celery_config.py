@@ -1,5 +1,5 @@
 def init_celery(celery, app):
-    celery.conf.update(app.config)
+    # celery.conf.update(app.config)
     TaskBase = celery.Task
     class ContextTask(TaskBase):
         def __call__(self, *args, **kwargs):
