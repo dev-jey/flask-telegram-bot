@@ -334,8 +334,8 @@ function logout() {
         crossDomain: true,
         global: true
         ,success: function (data) {
-            displayAlert('success');
-            $("#return-message").html(data);
+            // displayAlert('success');
+            // $("#return-message").html(data);
         },
         error: function (error) {
             displayAlert('error');
