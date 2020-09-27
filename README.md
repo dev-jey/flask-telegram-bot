@@ -1,15 +1,49 @@
 # Telegram Bot
 
-export FLASK_ENV=development\
-export FLASK_APP=run.py\
-export SECRET_KEY=""The secret key"\
-export DATABASE_URL="The DB URL"\
-export APP_SETTINGS=development\
-export TIME_MEASURE_SECONDS="Time in seconds"\
+This is a chatbot created in flask to enable users to automate the repetitive process of sending messages to channels or groups.
 
-export MAIL_SERVER="Server"\
-export MAIL_PORT="mail_port"\
-export MAIL_USERNAME="sender's email"\
-export MAIL_PASSWORD="app password for email"\
-export MAIL_USE_TLS="Boolean"\
-export MAIL_USE_SSL="Boolean"\
+## Installation
+1. Clone the repo.
+
+2. Create a virtual environment.
+
+> virtualenv -p python3 env.
+
+3. Install dependecies.
+> pip install -r requirements.txt.
+
+4. Export environment variables. 
+
+## Env 
+
+> source env/bin/activate <br>
+> export FLASK_ENV=development <br>
+> export FLASK_APP=run.py <br>
+> export SECRET_KEY=secretkey <br>
+> export DATABASE_URL=eg postgres://localhost/telegram <br>
+> export APP_SETTINGS=development <br>
+> export TIME_MEASURE_SECONDS=60 <br>
+> export REDIS_URL=redis://127.0.0.1:6379 <br>
+> export MAIL_SERVER=smtp.gmail.com <br>
+> export MAIL_PORT=465 <br>
+> export MAIL_USERNAME=theadminemail@provider.etc <br>
+> export MAIL_PASSWORD=theapppassword <br>
+> export MAIL_USE_TLS=False <br>
+> export MAIL_USE_SSL=True <br>
+<br>
+
+5. Run redis.
+
+> redis-server   
+
+6. Run celery <br>
+  
+> celery -A application.celery_worker.celery worker -l info --pool=gevent --concurrency=1000  <br>
+
+7. Start the server <br>
+  
+> flask run <br>
+    
+ ## Technologies
+Celery.
+Selenium
