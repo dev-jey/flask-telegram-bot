@@ -38,7 +38,7 @@ This is a chatbot created in flask to enable users to automate the repetitive pr
 
 6. Run celery <br>
   
-> celery -A application.celery_worker.celery worker -l info --pool=gevent --concurrency=1000  <br>
+> celery -A  application.celery_worker.celery worker -l info --concurrency=3 --beat -E <br>
 
 7. Start the server <br>
   
