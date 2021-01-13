@@ -25,9 +25,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from flask_login import login_required, current_user
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from flask import current_app as app
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
+from .telegram import TelegramFunctionality
 
 options = webdriver.ChromeOptions()
 options.add_argument("--window-size=1920,1080")
@@ -45,6 +47,8 @@ app.permanent_session_lifetime = datetime.timedelta(days=1)
 
 
 logger = logging.getLogger(__name__)
+
+telegramhelper = TelegramFunctionality()
 
 # set log level
 logging.basicConfig(level=logging.INFO,
@@ -225,16 +229,7 @@ def edit_a_message():
 @login_required
 def send_code():
     global driver
-    try:
-        if os.environ.get('FLASK_ENV') == 'production':
-            driver = webdriver.Chrome(executable_path=str(
-                os.environ.get('CHROMEDRIVER_PATH')), options=options)
-        else:
-            driver = webdriver.Chrome(
-                ChromeDriverManager().install(), options=options)
-    except Exception as e:
-        print(e)
-        return make_response(f"We are having trouble processing your request. Please check your internet connection", 400)
+    driver = telegramhelper.check_chrome_driver_path(options)
     wait = WebDriverWait(driver, 30)
     executor_url = driver.command_executor._url
     session_id = driver.session_id
@@ -249,78 +244,25 @@ def send_code():
         process.session_id = session_id
         process.executor_url = executor_url
         db.session.commit()
-        logger.info(f"EXECUTOR_URL: {executor_url}, SESSION_ID:{session_id}")
-        if code == "" or code is None:
-            close_driver(driver)
-            return make_response(f"Enter a valid country code e.g 254", 400)
-        if mobile_no == "" or mobile_no is None or len(mobile_no) < 6:
-            close_driver(driver)
-            return make_response(f"Enter a valid mobile no e.g 0712345678", 400)
-        driver.get('https://web.telegram.org/#/login')
-        wait.until(
-            lambda driver: driver.current_url == 'https://web.telegram.org/#/login')
-        wait.until(
-            EC.element_to_be_clickable((By.XPATH, "/html/body/div[1]/div/div[2]/div[2]/form/div[2]/div[1]/input")))
-        # Codefield
-        code_field = driver.find_element_by_xpath(
-            "/html/body/div[1]/div/div[2]/div[2]/form/div[2]/div[1]/input"
-        )
-        code_field.clear()
-        code_field.send_keys(code)
-        # MobileField
-        mobile_field = driver.find_element_by_xpath(
-            "/html/body/div[1]/div/div[2]/div[2]/form/div[2]/div[2]/input"
-        )
-        mobile_field.clear()
-        mobile_field.send_keys(mobile_no)
-        driver.implicitly_wait(3)
-        driver.find_element_by_xpath(
-            "/html/body/div[1]/div/div[2]/div[2]/form/div[2]/div[2]/input"
-        ).send_keys(Keys.ENTER)
-        try:
-            wait.until(
-                EC.visibility_of_element_located(
-                    (By.XPATH, "//button[@ng-click='$close(data)']"))
-            )
-            driver.find_element_by_xpath(
-                "//button[@ng-click='$close(data)']").click()
-        except BaseException as e:
-            # close_driver(driver)
-            logger.error(f'An error occurred: {e}')
-            return make_response(f"We are experiencing a problem sending the code", 400)
-        # Wrong mobile number error
-        try:
-            logger.info(f"Mobile no: {mobile_no}")
-            WebDriverWait(driver, 10).until(
-                EC.visibility_of_element_located(
-                    (By.XPATH, "//label[@my-i18n='login_incorrect_number']"))
-            )
-            if driver.find_element_by_xpath("//label[@my-i18n='login_incorrect_number']").is_displayed():
-                print("WRONG NUMBER ", driver.find_element_by_xpath("//label[@my-i18n='login_incorrect_number']"))
-                close_driver(driver)
-                return make_response(f"Code can't be sent. You entered a wrong phone number format.", 400)
-        except BaseException as e:
-            logger.info("1. Success, Mobile number correct")
-        try:
-            # Check for too many times error
-            too_many_times = WebDriverWait(driver, 10).until(
-                EC.visibility_of_element_located(
-                    (By.XPATH, "//button[@ng-click='$dismiss()']")))
-            if too_many_times:
-                close_driver(driver)
-                return make_response(f"Code can't be sent. You are performing too many actions. Please try again later.", 400)
-        except BaseException as e:
-            logger.info("2. Success, No too many times error")
-        try:
-            driver.find_element_by_xpath("//input[@ng-model='credentials.phone_code']").is_displayed()
-        except:               
-            close_driver(driver)
-            return make_response(f"We are experiencing a problem sending the code", 400)
-        return make_response(f"Code has been sent. Check your messages or telegram app", 200)
     except BaseException as e:
         logger.error(f'An error occurred: {e}')
         close_driver(driver)
+        return make_response(f"We are experiencing a problem identifying the process to run", 400)
+
+    logger.info(f"EXECUTOR_URL: {executor_url}, SESSION_ID:{session_id}")
+    if code == "" or code is None:
+        close_driver(driver)
+        return make_response(f"Enter a valid country code e.g 254", 400)
+    if mobile_no == "" or mobile_no is None or len(mobile_no) < 6:
+        close_driver(driver)
+        return make_response(f"Enter a valid mobile no e.g 0712345678", 400)
+    telegramhelper.try_to_login(wait, code, mobile_no, logger)
+    # Wrong mobile number error
+    if telegramhelper.check_if_multiple_sends(logger):
+        return make_response(f"Code can't be sent. You are performing too many actions. Please try again later.", 400)
+    if not telegramhelper.check_code_sent():
         return make_response(f"We are experiencing a problem sending the code", 400)
+    return make_response(f"Code has been sent. Check your messages or telegram app", 200)
 
 
 @app.route("/verify_code", methods=['POST'])
@@ -329,23 +271,10 @@ def verify_mobile_code():
     data = request.get_json()
     my_code = data["my_code"]
     pid = data["pid"]
-    if my_code == "" or my_code is None:
-        return make_response(f"Enter a verification code", 400)
-    if len(my_code) != 5:
-        return make_response(f"Code must be  5 digits.", 400)
+    telegramhelper.validate_verification_code(my_code)
     logger.info(f"My_code: {my_code} PID: {pid}")
-    try:
-        process = Message.query.filter(
-            Message.id == int(pid)
-        ).first()
-    except:
-        return make_response(f"We are having trouble processing your request.", 400)
-
-    try:
-        driver2 = webdriver.Remote(
-            command_executor=process.executor_url, desired_capabilities={})
-    except Exception as e:
-        return make_response(f"We are having trouble processing your request. Please check your internet connection", 400)
+    process = telegramhelper.get_current_process_from_db(pid)
+    driver2 = telegramhelper.connect_to_existing_driver()
 
     if driver2.session_id != process.session_id:
         close_driver(driver2)
@@ -369,43 +298,13 @@ def verify_mobile_code():
         driver2.find_element_by_xpath(
             "//input[@ng-model='search.query']").send_keys(saved_message.name)
         driver2.implicitly_wait(3)
-        try:
-            search_results = driver2.find_elements_by_xpath(
-                "//a[@ng-mousedown='dialogSelect(myResult.peerString)']")
-            search_results_alternate = driver2.find_elements_by_xpath(
-                "//a[@ng-mousedown='dialogSelect(dialogMessage.peerString, dialogMessage.unreadCount == -1 && dialogMessage.mid)']"
-            )
-            if len(search_results) == 0 and len(search_results_alternate) == 0:
-                close_driver(driver2)
-                return make_response("The channel or group name was not found", 404)
-        except BaseException as e:
-            logger.info('Search results found')
-        if search_results:
-            driver2.find_elements_by_xpath(
-                "//a[@ng-mousedown='dialogSelect(myResult.peerString)']")[0].click()
-        if search_results_alternate:
-            driver2.find_elements_by_xpath(
-                "//a[@ng-mousedown='dialogSelect(dialogMessage.peerString, dialogMessage.unreadCount == -1 && dialogMessage.mid)']")[0].click()
-        channel_name = driver2.find_element_by_xpath(
-            "//span[@my-peer-link='historyPeer.id']").text
-        channel_members = None
-        can_send = None
-        try:
-            channel_members = driver2.find_element_by_xpath(
-                "//span[@my-chat-status='-historyPeer.id']").text
-            can_send = driver2.find_element_by_xpath(
-                    "/html/body/div[1]/div[2]/div/div[2]/div[3]/div/div[3]/div[2]/div/div/div/form/div[2]/div[5]").is_displayed()
-        except:
-            pass
-
-        logger.info(f"Channel Name: {channel_name}")
-        logger.info(f"Channel_members: {channel_members}")
-
+        channel_search = telegramhelper.search_channel(logger)
+        channel_detail = telegramhelper.check_channel_details(channel_search["search_results"], channel_search["search_results_alternate"], logger)
         return make_response(jsonify({
             "message": "Confirm channel details to proceed",
-            "can_send": can_send,
-            "channel_name": channel_name,
-            "channel_members": channel_members
+            "can_send": channel_detail["can_send"],
+            "channel_name": channel_detail["channel_name"],
+            "channel_members": channel_detail["channel_members"]
         }), 200)
 
     except BaseException as e:
@@ -457,7 +356,7 @@ def stop_process():
             Message.id == int(pid)
         ).first()
         driver4 = webdriver.Remote(
-            command_executor=existing_process.executor_url, desired_capabilities={})
+            command_executor=existing_process.executor_url, desired_capabilities=DesiredCapabilities.CHROME)
         if driver4.session_id != existing_process.session_id:
             close_driver(driver4)
         driver4.session_id = existing_process.session_id

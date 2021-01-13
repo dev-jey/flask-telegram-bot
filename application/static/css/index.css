@@ -758,7 +758,7 @@ a {
 .alert{
     position: absolute;
     display: grid;
-    width: 97%;
+    width: 63%;
     top: 0;
     z-index: 1000;
     visibility: hidden;
@@ -767,6 +767,7 @@ a {
     justify-content: center;
     align-content: center;
     place-items: center;
+    position: fixed;
 }
 #return-message{
     background: rgb(255, 255, 255);
@@ -1002,6 +1003,7 @@ a {
     .alert{
         margin-top: 1rem;
         width: 95%;;
+        margin: auto;
     }
     #return-message{
         max-width: 500px;
