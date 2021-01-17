@@ -1,7 +1,6 @@
 """Flask configuration variables."""
 from os import environ, path
 from dotenv import load_dotenv
-from celery.schedules import crontab
 from celery.utils.log import get_task_logger
 
 basedir = path.abspath(path.dirname(__file__))
@@ -35,10 +34,10 @@ class Config:
     CELERY_RESULT_SERIALIZER = 'json'
     CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
 
-    CELERYBEAT_SCHEDULE = {
-    # Execute every x minutes.
-    'run-start-task': {
-        'task': 'send_messages',
-        'schedule': crontab(minute=environ.get('TIME_MEASURE_SECONDS', '')),
-        }
-    }
+    # CELERYBEAT_SCHEDULE = {
+    # # Execute every x minutes.
+    # 'run-start-task': {
+    #     'task': 'send_messages',
+    #     'schedule': crontab(minute=environ.get('TIME_MEASURE_SECONDS', '')),
+    #     }
+    # }

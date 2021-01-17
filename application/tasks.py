@@ -15,7 +15,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
 from .models import db, Message  as  Msg
 
-from celery.schedules import crontab
+# from celery.schedules import crontab
 from celery.utils.log import get_task_logger
 from config import Config
 
