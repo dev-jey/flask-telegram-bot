@@ -4,3 +4,4 @@ __pycache__
 logfile
 env/
 dump.rdb
+celerybeat-schedule
